@@ -1,3 +1,15 @@
+# TL;DR
+
+```bash
+# Run Baseline
+$ python src/baseline_main.py --model=mlp --dataset=mnist --epochs=10
+
+# Run FL
+$ python src/federated_main.py --model=mlp --dataset=mnist --iid=0 --epochs=10
+```
+
+---
+
 # Federated-Learning (PyTorch)
 
 Implementation of the vanilla federated learning paper : [Communication-Efficient Learning of Deep Networks from Decentralized Data](https://arxiv.org/abs/1602.05629).

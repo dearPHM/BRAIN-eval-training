@@ -138,7 +138,7 @@ if __name__ == '__main__':
     print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
 
     # Saving the objects train_loss and train_accuracy:
-    file_name = './save/objects/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_{}.pkl'.\
+    file_name = './save/objects/fedasync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_{}.pkl'.\
         format(args.dataset, args.model, args.epochs, args.frac, args.iid,
                args.local_ep, args.local_bs, args.byzantines, args.stale, args.alpha, time.time())
 
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     plt.plot(range(len(train_loss)), train_loss, color='r')
     plt.ylabel('Training loss')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_loss.png'.
+    plt.savefig('./save/fedasync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_loss.png'.
                 format(args.dataset, args.model, args.epochs, args.frac,
                        args.iid, args.local_ep, args.local_bs, args.byzantines, args.stale, args.alpha))
 
@@ -168,6 +168,6 @@ if __name__ == '__main__':
     plt.plot(range(len(train_accuracy)), train_accuracy, color='k')
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_acc.png'.
+    plt.savefig('./save/fedasync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_acc.png'.
                 format(args.dataset, args.model, args.epochs, args.frac,
                        args.iid, args.local_ep, args.local_bs, args.byzantines, args.stale, args.alpha))

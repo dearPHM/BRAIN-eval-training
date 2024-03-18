@@ -26,7 +26,7 @@ def args_parser():
     parser.add_argument('--momentum', type=float, default=0.5,
                         help='SGD momentum (default: 0.5)')
 
-    # fedAsync arguments
+    # fedasync arguments
     parser.add_argument('--stale', type=int, default=4,
                         help='max staleness (default: 4)')
     parser.add_argument('--alpha', type=float, default=0.6,

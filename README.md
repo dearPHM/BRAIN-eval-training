@@ -1,11 +1,44 @@
 # TL;DR
 
-```bash
-# Run Baseline
-$ python src/baseline_main.py --model=mlp --dataset=mnist --epochs=10
+### SGD - Baseline
 
-# Run FL
-$ python src/federated_main.py --model=mlp --dataset=mnist --iid=0 --epochs=10
+```bash
+$ python src/baseline_main.py --model=cnn --dataset=cifar --epochs=50 --verbose=0
+```
+
+### FedAvg - Baseline
+
+```bash
+# Run FedAvg
+# TODO: non-iid with unequal
+# TODO: check accuracy in non-iid case
+$ python src/federated_main.py --model=cnn --dataset=cifar --iid=1 --epochs=50 --num_users=21 --byzantine=10 --frac=0.1 --verbose=0
+```
+
+### FedAsync
+
+```bash
+$ python src/fedAsync_main.py --model=cnn --dataset=cifar --iid=1 --epochs=50 --num_users=21 --byzantine=10 --frac=0.1 --stale=4 --verbose=0
+```
+
+### BRAIN
+
+```bash
+$ python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=50 --num_users=21 --byzantine=10 --score_byzantines=0 --frac=0.1 --stale=4 --window=4 --verbose=0
+
+$ python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=50 --num_users=21 --byzantine=0 --score_byzantines=10 --frac=0.1 --stale=4 --window=4 --verbose=0
+```
+
+# Visualization
+
+Do multiple run (ex. 100) then draw dot graph.
+
+---
+
+# Test
+
+```bash
+$ pytest src/test_cache.py
 ```
 
 ---

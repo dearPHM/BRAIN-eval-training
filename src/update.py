@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Python version: 3.6
 
+import copy
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, Dataset
@@ -109,6 +110,14 @@ class LocalUpdate(object):
 
         accuracy = correct/total
         return accuracy, loss
+
+
+class ByzantineLocalUpdate(LocalUpdate):
+    def update_weights(self, model, global_round):
+        w_t = copy.deepcopy(model.state_dict())
+        for key in w_t.keys():
+            w_t[key] = torch.zeros_like(w_t[key])
+        return w_t, None
 
 
 def test_inference(args, model, test_dataset):

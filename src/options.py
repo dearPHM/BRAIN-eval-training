@@ -13,6 +13,8 @@ def args_parser():
                         help="number of rounds of training")
     parser.add_argument('--num_users', type=int, default=100,
                         help="number of users: K")
+    parser.add_argument('--byzantines', type=int, default=49,
+                        help="number of Byzantine users who submit zero weights: Z")
     parser.add_argument('--frac', type=float, default=0.1,
                         help='the fraction of clients: C')
     parser.add_argument('--local_ep', type=int, default=10,
@@ -25,10 +27,21 @@ def args_parser():
                         help='SGD momentum (default: 0.5)')
 
     # fedAsync arguments
-    parser.add_argument('--stale', type=int, default=50,
-                        help='max staleness (default: 50)')
+    parser.add_argument('--stale', type=int, default=4,
+                        help='max staleness (default: 4)')
     parser.add_argument('--alpha', type=float, default=0.6,
                         help='mixing hyperparameter (default: 0.6)')
+
+    # BRAIN arguments
+    parser.add_argument('--diff', type=float, default=0.5,
+                        help='(inverse of) difficulty related to sortition (default: 0.5)')
+    parser.add_argument('--window', type=int, default=4,
+                        help='window size for moving averaging (default: 2) (>= 2)')
+    parser.add_argument('--threshold', type=float, default=0.2,
+                        help='accuracy threshold to ignore (default: 0.2)')
+    parser.add_argument('--score_byzantines', type=int, default=49,
+                        help="number of Byzantine users who submit random score: SZ")
+
     # model arguments
     parser.add_argument('--model', type=str, default='mlp', help='model name')
     parser.add_argument('--kernel_num', type=int, default=9,
@@ -65,5 +78,6 @@ def args_parser():
                         help='rounds of early stopping')
     parser.add_argument('--verbose', type=int, default=1, help='verbose')
     parser.add_argument('--seed', type=int, default=1, help='random seed')
+
     args = parser.parse_args()
     return args

@@ -14,7 +14,7 @@ import torch
 from tensorboardX import SummaryWriter
 
 from options import args_parser
-from update import LocalUpdate, test_inference
+from update import LocalUpdate, ByzantineLocalUpdate, test_inference
 from models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
 from utils import get_dataset, compose_weight, exp_details
 
@@ -91,32 +91,34 @@ if __name__ == '__main__':
                 range(args.num_users), m, replace=False)
 
             for idx in idxs_users:
-                local_model = LocalUpdate(args=args, dataset=train_dataset,
-                                          idxs=user_groups[idx], logger=logger)
+                if idx >= args.byzantines:
+                    local_model = LocalUpdate(args=args, dataset=train_dataset,
+                                              idxs=user_groups[idx], logger=logger)
+                else:
+                    local_model = ByzantineLocalUpdate(args=args, dataset=train_dataset,
+                                                       idxs=user_groups[idx], logger=logger)
                 w, loss = local_model.update_weights(
                     model=copy.deepcopy(global_model), global_round=epoch)
                 # local_weights.append(copy.deepcopy(w))
-                # local_losses.append(copy.deepcopy(loss))
                 cache.add_item_with_random_counter(copy.deepcopy(w))
 
-        # global_weights = average_weights(local_weights)
         local_weights = cache.update_counters()
+
+        # update global weights
         if len(local_weights) != 0:
-            # update global weights
             for local_weight in local_weights:
                 global_weights = compose_weight(
                     global_weights, local_weight, args.alpha)
-
-                # update global weights
                 global_model.load_state_dict(global_weights)
 
         # Calculate avg training accuracy over all users at every epoch
         list_acc, list_loss = [], []
         global_model.eval()
-        for c in range(args.num_users):
+        for idx in idxs_users:
             local_model = LocalUpdate(args=args, dataset=train_dataset,
                                       idxs=user_groups[idx], logger=logger)
             acc, loss = local_model.inference(model=global_model)
+            # if idx >= args.byzantines:
             list_acc.append(acc)
             list_loss.append(loss)
         train_accuracy.append(sum(list_acc)/len(list_acc))
@@ -136,9 +138,9 @@ if __name__ == '__main__':
     print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
 
     # Saving the objects train_loss and train_accuracy:
-    file_name = './save/objects/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_S{}_A{}_{}.pkl'.\
+    file_name = './save/objects/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_{}.pkl'.\
         format(args.dataset, args.model, args.epochs, args.frac, args.iid,
-               args.local_ep, args.local_bs, args.stale, args.alpha, time.time())
+               args.local_ep, args.local_bs, args.byzantines, args.stale, args.alpha, time.time())
 
     with open(file_name, 'wb') as f:
         pickle.dump([train_loss, train_accuracy], f)
@@ -156,9 +158,9 @@ if __name__ == '__main__':
     plt.plot(range(len(train_loss)), train_loss, color='r')
     plt.ylabel('Training loss')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_S{}_A{}_loss.png'.
+    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_loss.png'.
                 format(args.dataset, args.model, args.epochs, args.frac,
-                       args.iid, args.local_ep, args.local_bs, args.stale, args.alpha))
+                       args.iid, args.local_ep, args.local_bs, args.byzantines, args.stale, args.alpha))
 
     # Plot Average Accuracy vs Communication rounds
     plt.figure()
@@ -166,6 +168,6 @@ if __name__ == '__main__':
     plt.plot(range(len(train_accuracy)), train_accuracy, color='k')
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_S{}_A{}_acc.png'.
+    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_S{}_A{}_acc.png'.
                 format(args.dataset, args.model, args.epochs, args.frac,
-                       args.iid, args.local_ep, args.local_bs, args.stale, args.alpha))
+                       args.iid, args.local_ep, args.local_bs, args.byzantines, args.stale, args.alpha))

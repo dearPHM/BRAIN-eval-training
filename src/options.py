@@ -17,12 +17,16 @@ def args_parser():
                         help='the fraction of clients: C')
     parser.add_argument('--local_ep', type=int, default=10,
                         help="the number of local epochs: E")
-    parser.add_argument('--local_bs', type=int, default=10,
+    parser.add_argument('--local_bs', type=int, default=50,
                         help="local batch size: B")
     parser.add_argument('--lr', type=float, default=0.01,
                         help='learning rate')
     parser.add_argument('--momentum', type=float, default=0.5,
                         help='SGD momentum (default: 0.5)')
+
+    # fedAsync arguments
+    parser.add_argument('--stale', type=int, default=50,
+                        help='max staleness (default: 50)')
 
     # model arguments
     parser.add_argument('--model', type=str, default='mlp', help='model name')

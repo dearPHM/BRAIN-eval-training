@@ -1,3 +1,5 @@
 .DS_Store
-save
 src/__pycache__
+save
+data
+logs

@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # Python version: 3.6
 
-
+import time
+import pickle
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
 import torch
 from torch.utils.data import DataLoader
@@ -16,6 +16,8 @@ from models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
 
 
 if __name__ == '__main__':
+    start_time = time.time()
+
     args = args_parser()
     if args.gpu:
         torch.cuda.set_device(args.gpu)
@@ -33,6 +35,7 @@ if __name__ == '__main__':
             global_model = CNNFashion_Mnist(args=args)
         elif args.dataset == 'cifar':
             global_model = CNNCifar(args=args)
+
     elif args.model == 'mlp':
         # Multi-layer preceptron
         img_size = train_dataset[0][0].shape
@@ -58,9 +61,10 @@ if __name__ == '__main__':
         optimizer = torch.optim.Adam(global_model.parameters(), lr=args.lr,
                                      weight_decay=1e-4)
 
-    trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+    # trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+    trainloader = DataLoader(train_dataset, batch_size=50, shuffle=True)
     criterion = torch.nn.NLLLoss().to(device)
-    epoch_loss = []
+    train_loss, train_accuracy = [], []
 
     for epoch in tqdm(range(args.epochs)):
         batch_loss = []
@@ -75,24 +79,49 @@ if __name__ == '__main__':
             optimizer.step()
 
             if batch_idx % 50 == 0:
-                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                print('Train Epoch: {:4d} [{:6d}/{:6d} ({:3.0f}%)]\tLoss: {:10.6f}'.format(
                     epoch+1, batch_idx * len(images), len(trainloader.dataset),
                     100. * batch_idx / len(trainloader), loss.item()))
             batch_loss.append(loss.item())
 
         loss_avg = sum(batch_loss)/len(batch_loss)
         print('\nTrain loss:', loss_avg)
-        epoch_loss.append(loss_avg)
+        train_loss.append(loss_avg)
+        
+        # testing
+        test_acc, test_loss = test_inference(args, global_model, test_dataset)
+        print('Test on', len(test_dataset), 'samples')
+        print("Test Accuracy: {:.2f}%".format(100*test_acc))
+        train_accuracy.append(test_acc)
 
-    # Plot loss
+    # Saving the objects train_loss and train_accuracy:
+    file_name = './save/objects/nn_{}_{}_{}_loss_{}.pkl'.\
+        format(args.dataset, args.model, args.epochs, time.time())
+
+    with open(file_name, 'wb') as f:
+        pickle.dump([train_loss, train_accuracy], f)
+
+    print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
+
+    # PLOTTING (optional)
+    import matplotlib
+    import matplotlib.pyplot as plt
+    matplotlib.use('Agg')
+
+    # Plot Loss curve
     plt.figure()
-    plt.plot(range(len(epoch_loss)), epoch_loss)
-    plt.xlabel('epochs')
-    plt.ylabel('Train loss')
-    plt.savefig('../save/nn_{}_{}_{}.png'.format(args.dataset, args.model,
+    plt.title('Training Loss vs Communication rounds')
+    plt.plot(range(len(train_loss)), train_loss, color='r')
+    plt.ylabel('Training loss')
+    plt.xlabel('Communication Rounds')
+    plt.savefig('./save/nn_{}_{}_{}_loss.png'.format(args.dataset, args.model,
                                                  args.epochs))
 
-    # testing
-    test_acc, test_loss = test_inference(args, global_model, test_dataset)
-    print('Test on', len(test_dataset), 'samples')
-    print("Test Accuracy: {:.2f}%".format(100*test_acc))
+    # Plot Average Accuracy vs Communication rounds
+    plt.figure()
+    plt.title('Average Accuracy vs Communication rounds')
+    plt.plot(range(len(train_accuracy)), train_accuracy, color='k')
+    plt.ylabel('Average Accuracy')
+    plt.xlabel('Communication Rounds')
+    plt.savefig('./save/nn_{}_{}_{}_acc.png'.format(args.dataset, args.model,
+                                                 args.epochs))

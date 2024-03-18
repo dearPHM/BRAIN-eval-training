@@ -27,7 +27,8 @@ def args_parser():
     # fedAsync arguments
     parser.add_argument('--stale', type=int, default=50,
                         help='max staleness (default: 50)')
-
+    parser.add_argument('--alpha', type=float, default=0.6,
+                        help='mixing hyperparameter (default: 0.6)')
     # model arguments
     parser.add_argument('--model', type=str, default='mlp', help='model name')
     parser.add_argument('--kernel_num', type=int, default=9,

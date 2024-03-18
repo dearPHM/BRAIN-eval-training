@@ -22,10 +22,10 @@ def get_dataset(args):
              transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
         train_dataset = datasets.CIFAR10(data_dir, train=True, download=True,
-                                       transform=apply_transform)
+                                         transform=apply_transform)
 
         test_dataset = datasets.CIFAR10(data_dir, train=False, download=True,
-                                      transform=apply_transform)
+                                        transform=apply_transform)
 
         # sample training data amongst users
         if args.iid:
@@ -64,7 +64,8 @@ def get_dataset(args):
             # Sample Non-IID user data from Mnist
             if args.unequal:
                 # Chose uneuqal splits for every user
-                user_groups = mnist_noniid_unequal(train_dataset, args.num_users)
+                user_groups = mnist_noniid_unequal(
+                    train_dataset, args.num_users)
             else:
                 # Chose euqal splits for every user
                 user_groups = mnist_noniid(train_dataset, args.num_users)
@@ -82,6 +83,16 @@ def average_weights(w):
             w_avg[key] += w[i][key]
         w_avg[key] = torch.div(w_avg[key], len(w))
     return w_avg
+
+
+def compose_weight(w0, w1, a=0.6):
+    """
+    Returns the average of the weights.
+    """
+    w_t = copy.deepcopy(w0)
+    for key in w_t.keys():
+        w_t[key] = (1.0-a) * w0[key] + a * w1[key]
+    return w_t
 
 
 def exp_details(args):

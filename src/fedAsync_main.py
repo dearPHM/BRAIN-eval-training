@@ -16,7 +16,7 @@ from tensorboardX import SummaryWriter
 from options import args_parser
 from update import LocalUpdate, test_inference
 from models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
-from utils import get_dataset, average_weights, exp_details
+from utils import get_dataset, compose_weight, exp_details
 
 from cache import ItemCache
 
@@ -87,11 +87,12 @@ if __name__ == '__main__':
         if (epoch < args.epochs):
             global_model.train()
             m = max(int(args.frac * args.num_users), 1)
-            idxs_users = np.random.choice(range(args.num_users), m, replace=False)
+            idxs_users = np.random.choice(
+                range(args.num_users), m, replace=False)
 
             for idx in idxs_users:
                 local_model = LocalUpdate(args=args, dataset=train_dataset,
-                                        idxs=user_groups[idx], logger=logger)
+                                          idxs=user_groups[idx], logger=logger)
                 w, loss = local_model.update_weights(
                     model=copy.deepcopy(global_model), global_round=epoch)
                 # local_weights.append(copy.deepcopy(w))
@@ -102,11 +103,12 @@ if __name__ == '__main__':
         local_weights = cache.update_counters()
         if len(local_weights) != 0:
             # update global weights
-            global_weights = average_weights(local_weights)
-            # TODO: weighted average
+            for local_weight in local_weights:
+                global_weights = compose_weight(
+                    global_weights, local_weight, args.alpha)
 
-            # update global weights
-            global_model.load_state_dict(global_weights)
+                # update global weights
+                global_model.load_state_dict(global_weights)
 
         # Calculate avg training accuracy over all users at every epoch
         list_acc, list_loss = [], []
@@ -134,9 +136,9 @@ if __name__ == '__main__':
     print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
 
     # Saving the objects train_loss and train_accuracy:
-    file_name = './save/objects/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_{}.pkl'.\
+    file_name = './save/objects/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_S{}_A{}_{}.pkl'.\
         format(args.dataset, args.model, args.epochs, args.frac, args.iid,
-               args.local_ep, args.local_bs, time.time())
+               args.local_ep, args.local_bs, args.stale, args.alpha, time.time())
 
     with open(file_name, 'wb') as f:
         pickle.dump([train_loss, train_accuracy], f)
@@ -154,9 +156,9 @@ if __name__ == '__main__':
     plt.plot(range(len(train_loss)), train_loss, color='r')
     plt.ylabel('Training loss')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_loss.png'.
+    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_S{}_A{}_loss.png'.
                 format(args.dataset, args.model, args.epochs, args.frac,
-                       args.iid, args.local_ep, args.local_bs))
+                       args.iid, args.local_ep, args.local_bs, args.stale, args.alpha))
 
     # Plot Average Accuracy vs Communication rounds
     plt.figure()
@@ -164,6 +166,6 @@ if __name__ == '__main__':
     plt.plot(range(len(train_accuracy)), train_accuracy, color='k')
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_acc.png'.
+    plt.savefig('./save/fedAsync_{}_{}_{}_C{}_iid{}_E{}_B{}_S{}_A{}_acc.png'.
                 format(args.dataset, args.model, args.epochs, args.frac,
-                       args.iid, args.local_ep, args.local_bs))
+                       args.iid, args.local_ep, args.local_bs, args.stale, args.alpha))

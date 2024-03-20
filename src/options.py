@@ -9,22 +9,12 @@ def args_parser():
     parser = argparse.ArgumentParser()
 
     # federated arguments (Notation for the arguments followed from paper)
-    parser.add_argument('--epochs', type=int, default=10,
-                        help="number of rounds of training")
     parser.add_argument('--num_users', type=int, default=100,
                         help="number of users: K")
     parser.add_argument('--byzantines', type=int, default=49,
                         help="number of Byzantine users who submit zero weights: Z")
     parser.add_argument('--frac', type=float, default=0.1,
                         help='the fraction of clients: C')
-    parser.add_argument('--local_ep', type=int, default=10,
-                        help="the number of local epochs: E")
-    parser.add_argument('--local_bs', type=int, default=50,
-                        help="local batch size: B")
-    parser.add_argument('--lr', type=float, default=0.001,
-                        help='learning rate')
-    parser.add_argument('--momentum', type=float, default=0.9,
-                        help='SGD momentum (default: 0.9)')
 
     # fedasync arguments
     parser.add_argument('--stale', type=int, default=4,
@@ -36,7 +26,7 @@ def args_parser():
     parser.add_argument('--diff', type=float, default=0.55,
                         help='(inverse of) difficulty related to sortition (default: 0.55)')
     parser.add_argument('--window', type=int, default=4,
-                        help='window size for moving averaging (default: 2) (>= 2)')
+                        help='window size for moving averaging (default: 4) (>= 2)')
     parser.add_argument('--threshold', type=float, default=0.15,
                         help='accuracy threshold to ignore (default: 0.15)')
     parser.add_argument('--score_byzantines', type=int, default=49,
@@ -67,6 +57,16 @@ def args_parser():
                         of classes")
     parser.add_argument('--gpu', default=None, help="To use cuda, set \
                         to a specific GPU ID. Default set to use CPU.")
+    parser.add_argument('--epochs', type=int, default=10,
+                        help="number of rounds of training")
+    parser.add_argument('--local_ep', type=int, default=10,
+                        help="the number of local epochs: E")
+    parser.add_argument('--local_bs', type=int, default=50,
+                        help="local batch size: B")
+    parser.add_argument('--lr', type=float, default=0.001,
+                        help='learning rate')
+    parser.add_argument('--momentum', type=float, default=0.9,
+                        help='SGD momentum (default: 0.9)')
     parser.add_argument('--optimizer', type=str, default='sgd', help="type \
                         of optimizer")
     parser.add_argument('--iid', type=int, default=1,

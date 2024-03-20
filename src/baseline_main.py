@@ -98,7 +98,7 @@ if __name__ == '__main__':
         test_acc_collect.append(test_acc)
         test_loss_collect.append(test_loss)
 
-        print('Test on', len(test_dataset), 'samples')
+        print('\nTest on', len(test_dataset), 'samples')
         print("Test Accuracy: {:.2f}%".format(100*test_acc))
         print(f'Test Loss    : {format(test_loss)}')
 

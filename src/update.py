@@ -85,6 +85,7 @@ class LocalUpdate(object):
                         100. * batch_idx / len(self.trainloader), loss.item()))
                 self.logger.add_scalar('loss', loss.item())
                 batch_loss.append(loss.item())
+
             epoch_loss.append(sum(batch_loss)/len(batch_loss))
 
         return model.state_dict(), sum(epoch_loss) / len(epoch_loss)
@@ -111,7 +112,8 @@ class LocalUpdate(object):
             total += len(labels)
 
         accuracy = correct/total
-        return accuracy, loss/(batch_idx+1)
+        loss /= total
+        return accuracy, loss
 
 
 class ByzantineLocalUpdate(LocalUpdate):
@@ -152,4 +154,5 @@ def test_inference(args, model, test_dataset):
         total += len(labels)
 
     accuracy = correct/total
-    return accuracy, loss/(batch_idx+1)
+    loss /= total
+    return accuracy, loss

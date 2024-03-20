@@ -19,9 +19,11 @@ if __name__ == '__main__':
     start_time = time.time()
 
     args = args_parser()
-    if args.gpu:
+
+    device = torch.device('cuda' if (
+        args.gpu != None and torch.cuda.is_available()) else 'cpu')
+    if device == 'cuda':
         torch.cuda.set_device(args.gpu)
-    device = 'cuda' if args.gpu else 'cpu'
 
     # load datasets
     train_dataset, test_dataset, _ = get_dataset(args)
@@ -67,11 +69,10 @@ if __name__ == '__main__':
     # criterion = torch.nn.NLLLoss().to(device)
     criterion = torch.nn.CrossEntropyLoss().to(device)
 
-    train_loss, train_accuracy = [], []
+    test_loss_collect, test_acc_collect = [], []
 
     for epoch in tqdm(range(args.epochs)):
-        batch_loss = []
-
+        # batch_loss = []
         for batch_idx, (images, labels) in enumerate(trainloader):
             images, labels = images.to(device), labels.to(device)
 
@@ -81,31 +82,32 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-            if batch_idx % 50 == 0:
+            if args.verbose and (batch_idx % 50 == 0):
                 print('Train Epoch: {:4d} [{:6d}/{:6d} ({:3.0f}%)]\tLoss: {:10.6f}'.format(
                     epoch+1, batch_idx * len(images), len(trainloader.dataset),
                     100. * batch_idx / len(trainloader), loss.item()))
-            batch_loss.append(loss.item())
+
+            # batch_loss.append(loss.item())
 
         # loss_avg = sum(batch_loss)/len(batch_loss)
         # print('\nTrain loss:', loss_avg)
-        # train_loss.append(loss_avg)
+        # test_loss_collect.append(loss_avg)
 
         # testing
         test_acc, test_loss = test_inference(args, global_model, test_dataset)
-        train_accuracy.append(test_acc)
-        train_loss.append(test_loss)
+        test_acc_collect.append(test_acc)
+        test_loss_collect.append(test_loss)
 
         print('Test on', len(test_dataset), 'samples')
         print("Test Accuracy: {:.2f}%".format(100*test_acc))
         print(f'Test Loss    : {format(test_loss)}')
 
-    # Saving the objects train_loss and train_accuracy:
-    file_name = './save/objects/nn_{}_{}_{}_loss_{}.pkl'.\
-        format(args.dataset, args.model, args.epochs, time.time())
+    # Saving the objects test_loss_collect and test_acc_collect:
+    file_name = './save/objects/nn_{}_{}_{}_iid{}_loss_{}.pkl'.\
+        format(args.dataset, args.model, args.epochs, args.iid, time.time())
 
     with open(file_name, 'wb') as f:
-        pickle.dump([train_loss, train_accuracy], f)
+        pickle.dump([test_loss_collect, test_acc_collect], f)
 
     print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
 
@@ -117,17 +119,17 @@ if __name__ == '__main__':
     # Plot Loss curve
     plt.figure()
     plt.title('Training Loss vs Communication rounds')
-    plt.plot(range(len(train_loss)), train_loss, color='r')
+    plt.plot(range(len(test_loss_collect)), test_loss_collect, color='r')
     plt.ylabel('Training loss')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/nn_{}_{}_{}_loss.png'.format(args.dataset, args.model,
-                                                     args.epochs))
+    plt.savefig('./save/nn_{}_{}_{}_iid{}_loss.png'.format(args.dataset, args.model,
+                                                           args.epochs, args.iid))
 
     # Plot Average Accuracy vs Communication rounds
     plt.figure()
     plt.title('Average Accuracy vs Communication rounds')
-    plt.plot(range(len(train_accuracy)), train_accuracy, color='k')
+    plt.plot(range(len(test_acc_collect)), test_acc_collect, color='k')
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/nn_{}_{}_{}_acc.png'.format(args.dataset, args.model,
-                                                    args.epochs))
+    plt.savefig('./save/nn_{}_{}_{}_iid{}_acc.png'.format(args.dataset, args.model,
+                                                          args.epochs, args.iid,))

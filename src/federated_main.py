@@ -100,31 +100,33 @@ if __name__ == '__main__':
         global_weights = average_weights(local_weights)
         global_model.load_state_dict(global_weights)
 
-        # Calculate avg training accuracy over all users at every epoch
-        list_acc, list_loss = [], []
-        global_model.eval()
-        for idx in idxs_users:
-            local_model = LocalUpdate(args=args, dataset=train_dataset,
-                                      idxs=user_groups[idx], logger=logger)
-            acc, loss = local_model.inference(model=global_model)
-            # if idx >= args.byzantines:
-            list_acc.append(acc)
-            list_loss.append(loss)
-        train_accuracy.append(sum(list_acc)/len(list_acc))
-        train_loss.append(sum(list_loss)/len(list_loss))
+        # # Calculate avg training accuracy over all users at every epoch
+        # list_acc, list_loss = [], []
+        # global_model.eval()
+        # for idx in idxs_users:
+        #     local_model = LocalUpdate(args=args, dataset=train_dataset,
+        #                               idxs=user_groups[idx], logger=logger)
+        #     acc, loss = local_model.inference(model=global_model)
+        #     # if idx >= args.byzantines:
+        #     list_acc.append(acc)
+        #     list_loss.append(loss)
+        # train_accuracy.append(sum(list_acc)/len(list_acc))
+        # train_loss.append(sum(list_loss)/len(list_loss))
 
-        # print global training loss after every 'i' rounds
-        if (epoch+1) % print_every == 0:
-            print(f' \nAvg Training Stats after {epoch+1} global rounds:')
-            print(f'Training Loss : {np.mean(np.array(train_loss))}')
-            print('Train Accuracy: {:.2f}% \n'.format(100*train_accuracy[-1]))
+        # # print global training loss after every 'i' rounds
+        # if (epoch+1) % print_every == 0:
+        #     print(f' \nAvg Training Stats after {epoch+1} global rounds:')
+        #     print(f'Training Loss : {np.mean(np.array(train_loss))}')
+        #     print('Train Accuracy: {:.2f}% \n'.format(100*train_accuracy[-1]))
 
-    # Test inference after completion of training
-    test_acc, test_loss = test_inference(args, global_model, test_dataset)
+        # Test inference after completion of training
+        test_acc, test_loss = test_inference(args, global_model, test_dataset)
+        train_accuracy.append(test_acc)
+        train_loss.append(test_loss)
 
-    print(f' \n Results after {args.epochs} global rounds of training:')
-    print("|---- Avg Train Accuracy: {:.2f}%".format(100*train_accuracy[-1]))
-    print("|---- Test Accuracy: {:.2f}%".format(100*test_acc))
+        print(f'\nResults after {args.epochs+1} global rounds of training:')
+        print("Test Accuracy: {:.2f}%".format(100*test_acc))
+        print(f'Test Loss    : {format(test_loss)}')
 
     # Saving the objects train_loss and train_accuracy:
     file_name = './save/objects/fedavg_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_{}.pkl'.\

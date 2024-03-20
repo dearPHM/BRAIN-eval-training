@@ -85,6 +85,7 @@ class CNNCifar(nn.Module):
         x = self.fc3(x)
         return F.log_softmax(x, dim=1)
 
+
 class modelC(nn.Module):
     def __init__(self, input_size, n_classes=10, **kwargs):
         super(AllConvNet, self).__init__()
@@ -98,7 +99,6 @@ class modelC(nn.Module):
         self.conv8 = nn.Conv2d(192, 192, 1)
 
         self.class_conv = nn.Conv2d(192, n_classes, 1)
-
 
     def forward(self, x):
         x_drop = F.dropout(x, .2)

@@ -56,14 +56,17 @@ if __name__ == '__main__':
     # Set optimizer and criterion
     if args.optimizer == 'sgd':
         optimizer = torch.optim.SGD(global_model.parameters(), lr=args.lr,
-                                    momentum=0.5)
+                                    momentum=args.momentum)
     elif args.optimizer == 'adam':
         optimizer = torch.optim.Adam(global_model.parameters(), lr=args.lr,
                                      weight_decay=1e-4)
 
     # trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True)
     trainloader = DataLoader(train_dataset, batch_size=50, shuffle=True)
-    criterion = torch.nn.NLLLoss().to(device)
+
+    # criterion = torch.nn.NLLLoss().to(device)
+    criterion = torch.nn.CrossEntropyLoss().to(device)
+
     train_loss, train_accuracy = [], []
 
     for epoch in tqdm(range(args.epochs)):
@@ -84,15 +87,18 @@ if __name__ == '__main__':
                     100. * batch_idx / len(trainloader), loss.item()))
             batch_loss.append(loss.item())
 
-        loss_avg = sum(batch_loss)/len(batch_loss)
-        print('\nTrain loss:', loss_avg)
-        train_loss.append(loss_avg)
-        
+        # loss_avg = sum(batch_loss)/len(batch_loss)
+        # print('\nTrain loss:', loss_avg)
+        # train_loss.append(loss_avg)
+
         # testing
         test_acc, test_loss = test_inference(args, global_model, test_dataset)
+        train_accuracy.append(test_acc)
+        train_loss.append(test_loss)
+
         print('Test on', len(test_dataset), 'samples')
         print("Test Accuracy: {:.2f}%".format(100*test_acc))
-        train_accuracy.append(test_acc)
+        print(f'Test Loss    : {format(test_loss)}')
 
     # Saving the objects train_loss and train_accuracy:
     file_name = './save/objects/nn_{}_{}_{}_loss_{}.pkl'.\
@@ -115,7 +121,7 @@ if __name__ == '__main__':
     plt.ylabel('Training loss')
     plt.xlabel('Communication Rounds')
     plt.savefig('./save/nn_{}_{}_{}_loss.png'.format(args.dataset, args.model,
-                                                 args.epochs))
+                                                     args.epochs))
 
     # Plot Average Accuracy vs Communication rounds
     plt.figure()
@@ -124,4 +130,4 @@ if __name__ == '__main__':
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
     plt.savefig('./save/nn_{}_{}_{}_acc.png'.format(args.dataset, args.model,
-                                                 args.epochs))
+                                                    args.epochs))

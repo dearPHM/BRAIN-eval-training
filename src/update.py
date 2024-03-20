@@ -31,8 +31,10 @@ class LocalUpdate(object):
         self.trainloader, self.validloader, self.testloader = self.train_val_test(
             dataset, list(idxs))
         self.device = 'cuda' if args.gpu else 'cpu'
+
         # Default criterion set to NLL loss function
-        self.criterion = nn.NLLLoss().to(self.device)
+        # self.criterion = nn.NLLLoss().to(self.device)
+        self.criterion = nn.CrossEntropyLoss().to(self.device)
 
     def train_val_test(self, dataset, idxs):
         """
@@ -60,7 +62,7 @@ class LocalUpdate(object):
         # Set optimizer for the local updates
         if self.args.optimizer == 'sgd':
             optimizer = torch.optim.SGD(model.parameters(), lr=self.args.lr,
-                                        momentum=0.5)
+                                        momentum=self.args.momentum)
         elif self.args.optimizer == 'adam':
             optimizer = torch.optim.Adam(model.parameters(), lr=self.args.lr,
                                          weight_decay=1e-4)
@@ -109,7 +111,7 @@ class LocalUpdate(object):
             total += len(labels)
 
         accuracy = correct/total
-        return accuracy, loss
+        return accuracy, loss/(batch_idx+1)
 
 
 class ByzantineLocalUpdate(LocalUpdate):
@@ -128,7 +130,10 @@ def test_inference(args, model, test_dataset):
     loss, total, correct = 0.0, 0.0, 0.0
 
     device = 'cuda' if args.gpu else 'cpu'
-    criterion = nn.NLLLoss().to(device)
+
+    # criterion = nn.NLLLoss().to(device)
+    criterion = nn.CrossEntropyLoss().to(device)
+
     testloader = DataLoader(test_dataset, batch_size=128,
                             shuffle=False)
 
@@ -147,4 +152,4 @@ def test_inference(args, model, test_dataset):
         total += len(labels)
 
     accuracy = correct/total
-    return accuracy, loss
+    return accuracy, loss/(batch_idx+1)

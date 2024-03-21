@@ -77,7 +77,7 @@ if __name__ == '__main__':
     for epoch in tqdm(range(args.epochs)):
         # local_weights, local_losses = [], []
         local_weights = []
-        print(f'\n | Global Training Round : {epoch+1} |\n')
+        # print(f'\n | Global Training Round : {epoch+1} |\n')
 
         global_model.train()
         m = max(int(args.frac * args.num_users), 1)
@@ -125,11 +125,10 @@ if __name__ == '__main__':
         test_acc, test_loss = test_inference(args, global_model, test_dataset)
         test_acc_collect.append(test_acc)
         test_loss_collect.append(test_loss)
-
-        print(
-            f'\nResults after {epoch+1}/{args.epochs+1} global rounds of training:')
-        print("Test Accuracy: {:.2f}%".format(100*test_acc))
-        print(f'Test Loss    : {format(test_loss)}')
+        # print(
+        #     f'\nResults after {epoch+1}/{args.epochs+1} global rounds of training:')
+        # print("Test Accuracy: {:.2f}%".format(100*test_acc))
+        # print(f'Test Loss    : {format(test_loss)}')
 
     # Saving the objects test_loss_collect and test_acc_collect:
     file_name = './save/objects/fedavg_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_{}.pkl'.\

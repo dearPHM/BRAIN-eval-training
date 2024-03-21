@@ -36,7 +36,7 @@ class LocalUpdate(object):
             torch.cuda.set_device(args.gpu)
 
         self.trainloader, self.validloader, self.testloader = self.train_val_test(
-            dataset.to(self.device), list(idxs))
+            dataset, list(idxs))
 
         # Default criterion set to NLL loss function
         # self.criterion = nn.NLLLoss().to(self.device)
@@ -76,7 +76,7 @@ class LocalUpdate(object):
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.trainloader):
-                # images, labels = images.to(self.device), labels.to(self.device)
+                images, labels = images.to(self.device), labels.to(self.device)
 
                 model.zero_grad()
                 log_probs = model(images)
@@ -104,7 +104,7 @@ class LocalUpdate(object):
         loss, total, correct = 0.0, 0.0, 0.0
 
         for batch_idx, (images, labels) in enumerate(self.testloader):
-            # images, labels = images.to(self.device), labels.to(self.device)
+            images, labels = images.to(self.device), labels.to(self.device)
 
             # Inference
             outputs = model(images)

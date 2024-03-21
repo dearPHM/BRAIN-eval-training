@@ -184,9 +184,10 @@ if __name__ == '__main__':
         # print(f'Test Loss    : {format(test_loss)}')
 
     # Saving the objects test_loss_collect and test_acc_collect:
-    file_name = './save/objects/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_S{}_TH{}_{}.pkl'.\
+    file_name = './save/objects/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_D{}_W{}_S{}_TH{}_{}.pkl'.\
         format(args.dataset, args.model, args.epochs, args.frac, args.iid,
-               args.local_ep, args.local_bs, args.byzantines, args.score_byzantines, args.stale, args.threshold, time.time())
+               args.local_ep, args.local_bs, args.byzantines, args.score_byzantines,
+               args.diff, args.window, args.stale, args.threshold, time.time())
 
     with open(file_name, 'wb') as f:
         pickle.dump([test_loss_collect, test_acc_collect], f)
@@ -204,9 +205,10 @@ if __name__ == '__main__':
     plt.plot(range(len(test_loss_collect)), test_loss_collect, color='r')
     plt.ylabel('Training loss')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_S{}_TH{}_loss.png'.
+    plt.savefig('./save/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_D{}_W{}_S{}_TH{}_loss.png'.
                 format(args.dataset, args.model, args.epochs, args.frac,
-                       args.iid, args.local_ep, args.local_bs, args.byzantines, args.score_byzantines, args.stale, args.threshold))
+                       args.iid, args.local_ep, args.local_bs, args.byzantines, args.score_byzantines,
+                       args.diff, args.window, args.stale, args.threshold))
 
     # Plot Average Accuracy vs Communication rounds
     plt.figure()
@@ -214,6 +216,7 @@ if __name__ == '__main__':
     plt.plot(range(len(test_acc_collect)), test_acc_collect, color='k')
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_S{}_TH{}_acc.png'.
+    plt.savefig('./save/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_D{}_W{}_S{}_TH{}_acc.png'.
                 format(args.dataset, args.model, args.epochs, args.frac,
-                       args.iid, args.local_ep, args.local_bs, args.byzantines, args.score_byzantines, args.stale, args.threshold))
+                       args.iid, args.local_ep, args.local_bs, args.byzantines, args.score_byzantines,
+                       args.diff, args.window, args.stale, args.threshold))

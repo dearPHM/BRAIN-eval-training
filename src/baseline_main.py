@@ -98,10 +98,9 @@ if __name__ == '__main__':
         test_acc, test_loss = test_inference(args, global_model, test_dataset)
         test_acc_collect.append(test_acc)
         test_loss_collect.append(test_loss)
-
-        print('\nTest on', len(test_dataset), 'samples')
-        print("Test Accuracy: {:.2f}%".format(100*test_acc))
-        print(f'Test Loss    : {format(test_loss)}')
+        # print('\nTest on', len(test_dataset), 'samples')
+        # print("Test Accuracy: {:.2f}%".format(100*test_acc))
+        # print(f'Test Loss    : {format(test_loss)}')
 
     # Saving the objects test_loss_collect and test_acc_collect:
     file_name = './save/objects/nn_{}_{}_{}_iid{}_loss_{}.pkl'.\

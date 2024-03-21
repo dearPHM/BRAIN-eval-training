@@ -28,9 +28,15 @@ class LocalUpdate(object):
     def __init__(self, args, dataset, idxs, logger):
         self.args = args
         self.logger = logger
-        self.trainloader, self.validloader, self.testloader = self.train_val_test(
-            dataset, list(idxs))
         self.device = 'cuda' if args.gpu else 'cpu'
+
+        self.device = torch.device('cuda' if (
+            args.gpu != None and torch.cuda.is_available()) else 'cpu')
+        if self.device.type == 'cuda':
+            torch.cuda.set_device(args.gpu)
+
+        self.trainloader, self.validloader, self.testloader = self.train_val_test(
+            dataset.to(self.device), list(idxs))
 
         # Default criterion set to NLL loss function
         # self.criterion = nn.NLLLoss().to(self.device)
@@ -47,11 +53,11 @@ class LocalUpdate(object):
         idxs_test = idxs[int(0.9*len(idxs)):]
 
         trainloader = DataLoader(DatasetSplit(dataset, idxs_train),
-                                 batch_size=self.args.local_bs, shuffle=True)
+                                 batch_size=self.args.local_bs, num_workers=4, shuffle=True)
         validloader = DataLoader(DatasetSplit(dataset, idxs_val),
-                                 batch_size=(int(len(idxs_val)/10) if int(len(idxs_val)/10) > 1 else 1), shuffle=False)
+                                 batch_size=self.args.local_bs, num_workers=4, shuffle=False)
         testloader = DataLoader(DatasetSplit(dataset, idxs_test),
-                                batch_size=(int(len(idxs_test)/10) if int(len(idxs_test)/10) > 1 else 1), shuffle=False)
+                                batch_size=self.args.local_bs, num_workers=4, shuffle=False)
         return trainloader, validloader, testloader
 
     def update_weights(self, model, global_round):
@@ -70,7 +76,7 @@ class LocalUpdate(object):
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.trainloader):
-                images, labels = images.to(self.device), labels.to(self.device)
+                # images, labels = images.to(self.device), labels.to(self.device)
 
                 model.zero_grad()
                 log_probs = model(images)
@@ -98,7 +104,7 @@ class LocalUpdate(object):
         loss, total, correct = 0.0, 0.0, 0.0
 
         for batch_idx, (images, labels) in enumerate(self.testloader):
-            images, labels = images.to(self.device), labels.to(self.device)
+            # images, labels = images.to(self.device), labels.to(self.device)
 
             # Inference
             outputs = model(images)
@@ -131,13 +137,16 @@ def test_inference(args, model, test_dataset):
     model.eval()
     loss, total, correct = 0.0, 0.0, 0.0
 
-    device = 'cuda' if args.gpu else 'cpu'
+    device = torch.device('cuda' if (
+        args.gpu != None and torch.cuda.is_available()) else 'cpu')
+    if device.type == 'cuda':
+        torch.cuda.set_device(args.gpu)
 
     # criterion = nn.NLLLoss().to(device)
     criterion = nn.CrossEntropyLoss().to(device)
 
-    testloader = DataLoader(test_dataset, batch_size=128,
-                            shuffle=False)
+    testloader = DataLoader(
+        test_dataset, batch_size=args.local_bs, num_workers=4, shuffle=False)
 
     for batch_idx, (images, labels) in enumerate(testloader):
         images, labels = images.to(device), labels.to(device)

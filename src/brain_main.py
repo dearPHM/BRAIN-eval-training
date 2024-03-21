@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if (
         args.gpu != None and torch.cuda.is_available()) else 'cpu')
-    if device == 'cuda':
+    if device.type == 'cuda':
         torch.cuda.set_device(args.gpu)
 
     # load dataset and user groups
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         exit('Error: unrecognized model')
 
     # Set the model to train and send it to device.
-    global_model.to(device)
+    global_model = global_model.to(device)
     global_model.train()
     print(global_model)
 

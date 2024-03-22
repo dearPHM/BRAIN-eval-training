@@ -27,8 +27,8 @@ def args_parser():
                         help='(inverse of) difficulty related to sortition (default: 0.55)')
     parser.add_argument('--window', type=int, default=4,
                         help='window size for moving averaging (default: 4) (>= 2)')
-    parser.add_argument('--threshold', type=float, default=0.11,
-                        help='accuracy threshold to ignore (default: 0.11)')
+    parser.add_argument('--threshold', type=float, default=0.12,
+                        help='accuracy threshold to ignore (default: 0.12)')
     parser.add_argument('--score_byzantines', type=int, default=49,
                         help="number of Byzantine users who submit random score: SZ")
 

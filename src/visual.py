@@ -43,7 +43,7 @@ def load_and_average_files(category, files, load_path, save_path):
     # file_name = f'{save_path}/{category}_{time.time()}.pkl'
     file_name = f'{save_path}/{category}.pkl'
     with open(file_name, 'wb') as f:
-        pickle.dump(averaged_data, f)
+        pickle.dump([averaged_data, list(all_data.values())], f)
 
     return averaged_data, list(all_data.values())
 
@@ -76,7 +76,9 @@ def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path
     metric_name = "loss" if metric_index == 0 else "acc"
     x_axis = np.arange(len(avg_data[metric_index]))
 
-    plt.figure(figsize=(10, 6))
+    # plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(6, 4))
+    sns.set_theme(style="darkgrid")
 
     # Plot averaged data as a black line using Seaborn
     sns.lineplot(x=x_axis, y=avg_data[metric_index],

@@ -112,9 +112,11 @@ if __name__ == '__main__':
         local_weights = cache.update_counters()
 
         # BRAIN: do evaluate, to get score, among randomly sampled nodes
-        m = max(int(args.diff * args.num_users), 1)
-        committee = np.random.choice(
-            range(args.num_users), m, replace=False)
+        committee = list(range(args.num_users))
+        if args.diff != 1.0:
+            m = max(int(args.diff * args.num_users), 1)
+            committee = np.random.choice(
+                range(args.num_users), m, replace=False)
 
         local_eval_med_accs = []
         if len(local_weights) != 0:

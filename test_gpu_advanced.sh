@@ -25,10 +25,10 @@ python src/fedAsync_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --
 # BRAIN
 # python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
 # BRAIN - Byzantine
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=5 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
-# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=11 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=15 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=5 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=11 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=15 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
 
 # BRAIN - Score Byzantine
 # python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=5 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
@@ -37,10 +37,22 @@ python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num
 python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=15 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
 
 # BRAIN - Byzantine & Score Byzantine
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=5 --score_byzantines=5 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=5 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=5 --score_byzantines=10 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=10 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=5 --score_byzantines=5 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=5 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=11 --score_byzantines=5 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=15 --score_byzantines=5 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=5 --score_byzantines=10 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=10 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=11 --score_byzantines=10 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=15 --score_byzantines=10 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=5 --score_byzantines=11 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=11 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=11 --score_byzantines=11 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=15 --score_byzantines=11 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=5 --score_byzantines=15 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=15 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=11 --score_byzantines=15 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=15 --score_byzantines=15 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.125 --verbose=0 --local_bs=50 --gpu=0
 
 # BRAIN - Stale
 python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=8 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
@@ -48,21 +60,23 @@ python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num
 python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=32 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
 python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=64 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
 
-# BRAIN - Window (compare w/ Stale)
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=2 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=8 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=16 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=32 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
+# # BRAIN - Window (compare w/ Stale)
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=2 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=8 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=16 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=32 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
 
-# BRAIN - Quorum vs Score Byzantine (diff)
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=10 --frac=0.1 --stale=4 --diff=0.25 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=10 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=10 --frac=0.1 --stale=4 --diff=0.75 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=10 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
+# # BRAIN - Quorum vs Score Byzantine (diff)
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=10 --frac=0.1 --stale=4 --diff=0.25 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=10 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=10 --frac=0.1 --stale=4 --diff=0.75 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=10 --frac=0.1 --stale=4 --diff=1.0 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
 
 # BRAIN - Threshold
 python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
 python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.05 --verbose=0 --local_bs=50 --gpu=0
 python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.1 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.12 --verbose=0 --local_bs=50 --gpu=0
+python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.13 --verbose=0 --local_bs=50 --gpu=0
 python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.2 --verbose=0 --local_bs=50 --gpu=0
-python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.3 --verbose=0 --local_bs=50 --gpu=0
+# python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.3 --verbose=0 --local_bs=50 --gpu=0

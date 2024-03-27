@@ -103,7 +103,7 @@ if __name__ == '__main__':
         # print(f'Test Loss    : {format(test_loss)}')
 
     # Saving the objects test_loss_collect and test_acc_collect:
-    file_name = './save/objects/nn_{}_{}_{}_iid{}_loss_{}.pkl'.\
+    file_name = './save/objects/nn_{}_{}_{}_iid{}_{}.pkl'.\
         format(args.dataset, args.model, args.epochs, args.iid, time.time())
 
     with open(file_name, 'wb') as f:

@@ -1,5 +1,6 @@
 import os
 import pickle
+import time
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -15,14 +16,14 @@ def categorize_files(directory_path):
     return categories
 
 
-def load_and_average_files(files, directory_path):
+def load_and_average_files(category, files, load_path, save_path):
     all_data = defaultdict(list)  # To store data by their index for averaging
 
     # Track the max length seen for each index (0 for test_loss_collect, 1 for test_acc_collect)
     max_lengths = defaultdict(int)
 
     for file_name in files:
-        with open(os.path.join(directory_path, file_name), 'rb') as file:
+        with open(os.path.join(load_path, file_name), 'rb') as file:
             data = pickle.load(file)
             for i, values in enumerate(data):
                 all_data[i].append(values)
@@ -37,6 +38,12 @@ def load_and_average_files(files, directory_path):
         # Stack and then average, ignoring NaN values
         stacked = np.vstack(padded_lists)
         averaged_data.append(np.nanmean(stacked, axis=0))
+
+    # Saving the objects test_loss_collect and test_acc_collect:
+    # file_name = f'{save_path}/{category}_{time.time()}.pkl'
+    file_name = f'{save_path}/{category}.pkl'
+    with open(file_name, 'wb') as f:
+        pickle.dump(averaged_data, f)
 
     return averaged_data, list(all_data.values())
 
@@ -91,12 +98,14 @@ def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path
 
 if __name__ == '__main__':
     pkl_path = './save/objects'
-    png_save_paths = ['./save/loss', './save/acc']
+    avg_pkl_path = './save/avg_objects'
+    png_paths = ['./save/loss', './save/acc']
 
     categories = categorize_files(pkl_path)
 
     for category, files in categories.items():
-        avg_data, all_data = load_and_average_files(files, pkl_path)
+        avg_data, all_data = load_and_average_files(
+            category, files, pkl_path, avg_pkl_path)
         for metric_index in range(2):
             plot_data_seaborn(category, metric_index, avg_data,
-                              all_data, png_save_paths[metric_index])
+                              all_data, png_paths[metric_index])

@@ -107,6 +107,7 @@ def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path
     plt.close()
 
 
+# TODO: x-axis epochs (x20)
 if __name__ == '__main__':
     pkl_path = './save/objects'
     avg_pkl_path = './save/avg_objects'

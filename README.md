@@ -10,7 +10,6 @@ $ python src/baseline_main.py --model=cnn --dataset=cifar --epochs=50 --verbose=
 
 ```bash
 # Run FedAvg
-# TODO: more Epoch (2000? 5000?)
 # TODO: non-iid with unequal
 # TODO: check accuracy in non-iid case
 $ python src/federated_main.py --model=cnn --dataset=cifar --iid=1 --epochs=50 --num_users=21 --byzantines=10 --frac=0.1 --verbose=0 --optimizer=sgd --lr=0.001 --momentum=0.9 --threshold=0.0

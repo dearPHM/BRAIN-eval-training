@@ -12,6 +12,12 @@ def categorize_files(directory_path):
     for file_name in os.listdir(directory_path):
         if file_name.endswith('.pkl') and os.path.isfile(os.path.join(directory_path, file_name)):
             options_part, _, timestamp = file_name.rpartition('_')
+            method, _, ramains = options_part.partition('_')
+            dataset, _, ramains = ramains.partition('_')
+            network, _, ramains = ramains.partition('_')
+            epoch, _, ramains = ramains.partition('_')
+
+            options_part = method + '_' + dataset + '_' + network + '_' + ramains
             categories[options_part].append(file_name)
     return categories
 
@@ -67,6 +73,9 @@ def plot_data(category, metric_index, avg_data, all_data, directory_path):
     plt.xlabel('Epoch')
     plt.ylabel(metric_name)
     plt.legend()
+    plt.tight_layout()
+    plt.grid(linewidth=0.5)
+
     plt.savefig(
         f"{directory_path}/{len(all_data[metric_index])}_{category}_{metric_name}.png")
     plt.close()
@@ -78,7 +87,7 @@ def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path
 
     # plt.figure(figsize=(10, 6))
     plt.figure(figsize=(6, 4))
-    sns.set_theme(style="darkgrid")
+    # sns.set_theme(style="ticks")
 
     # Plot averaged data as a black line using Seaborn
     sns.lineplot(x=x_axis, y=avg_data[metric_index],

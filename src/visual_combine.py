@@ -3,8 +3,10 @@ import os
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 import seaborn as sns
 import pandas as pd
+import itertools
 
 
 def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, title, save_path,
@@ -15,8 +17,29 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
     sns.set_theme(style="ticks")
 
     # Initialize a color palette
-    # "hsv" is just an example, choose as per your preference
-    palette = sns.color_palette("bright", len(file_paths))
+    # palette = sns.color_palette("pastel", 10)
+    palette = [(0.6313725490196078, 0.788235294117647, 0.9568627450980393),
+               (0.5529411764705883, 0.8980392156862745, 0.6313725490196078),
+               (1.0, 0.7058823529411765, 0.5098039215686274),
+               (1.0, 0.6235294117647059, 0.6078431372549019),
+               (0.8156862745098039, 0.7333333333333333, 1.0),
+               (0.8705882352941177, 0.7333333333333333, 0.6078431372549019),
+               (0.9803921568627451, 0.6901960784313725, 0.8941176470588236),
+               (0.8117647058823529, 0.8117647058823529, 0.8117647058823529),
+               (1.0, 0.996078431372549, 0.6392156862745098),
+               (0.7254901960784313, 0.9490196078431372, 0.9411764705882353)]
+    markers = ['o', '^', 'd', 'X', 's', 'v', '*', 'p', '<', '>']
+    markers_palette = [(0.00784313725490196, 0.24313725490196078, 1.0),
+                       (0.10196078431372549, 0.788235294117647, 0.2196078431372549),
+                       (1.0, 0.48627450980392156, 0.0),
+                       (0.9098039215686274, 0.0, 0.043137254901960784),
+                       (0.5450980392156862, 0.16862745098039217, 0.8862745098039215),
+                       (0.6235294117647059, 0.2823529411764706, 0.0),
+                       (0.9450980392156862, 0.2980392156862745, 0.7568627450980392),
+                       (0.6392156862745098, 0.6392156862745098, 0.6392156862745098),
+                       (1.0, 0.7686274509803922, 0.0),
+                       (0.0, 0.8431372549019608, 1.0)]
+    custom_legend_handles = []
 
     # Find the maximum length among all datasets to ensure uniform plotting
     max_length = 0
@@ -33,6 +56,7 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
 
     # Plot each dataset, padding with NaNs where necessary
     for i, (avg_dataset, all_dataset, label) in enumerate(zip(avg_datasets, all_datasets, labels)):
+        # Adjust and plot data
         padded_avg_data = np.pad(
             avg_dataset, (0, max_length - len(avg_dataset)), 'constant', constant_values=np.nan)
 
@@ -41,19 +65,37 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
 
         # Specify color from the palette
         color = palette[i]
-
-        # Using pandas to handle NaNs gracefully in lineplot
-        padded_avg_data = padded_avg_data if x_max == None else padded_avg_data[:x_max]
-        df = pd.DataFrame(
-            {'Epoch': x_axis, 'Value': padded_avg_data, 'Label': label})
-        sns.lineplot(x='Epoch', y='Value', data=df,
-                     label=label, linewidth=0.75, color=color)
+        marker = markers[i]
+        marker_color = markers_palette[i]
 
         # Plot individual data points using Seaborn scatterplot for each data set
         for data_set in all_dataset:
             data_set = data_set if x_max == None else data_set[:x_max]
             sns.scatterplot(x=np.arange(len(data_set)),
-                            y=data_set, alpha=0.1, s=20, color=color, legend=False)
+                            y=data_set, alpha=0.2, s=20, color=color, legend=False)
+
+        # Using pandas to handle NaNs gracefully in lineplot
+        padded_avg_data = padded_avg_data if x_max == None else padded_avg_data[:x_max]
+        df = pd.DataFrame(
+            {'Epoch': x_axis, 'Value': padded_avg_data, 'Group': label})
+        sns.lineplot(x='Epoch', y='Value', data=df, style='Group', zorder=2,
+                     dashes=False,
+                     linewidth=0.75, color=marker_color)
+        #  markers=marker, markersize=4, markeredgewidth=0.5)
+
+        # Overlay scatterplot at a reduced frequency for markers
+        # Sampling for marker density
+        sampled_df = df.iloc[[(110+(i)*45) % x_max]]
+        sns.scatterplot(x='Epoch', y='Value', data=sampled_df, zorder=3,
+                        marker=marker, color=marker_color, s=50, edgecolor='black',
+                        legend=False)
+
+        # Create a custom legend handle for this dataset
+        line = mlines.Line2D([], [], color=marker_color, marker=marker,
+                             linestyle='-', linewidth=0.75,
+                             markersize=6, markeredgecolor='black', markeredgewidth=0.5,
+                             label=label)
+        custom_legend_handles.append(line)
 
     # Setting the y-axis limits
     plt.ylim(y_min, 1.0 if y_max == None else y_max)
@@ -75,7 +117,8 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
     # plt.title(f"{metric_name}")
     plt.xlabel(None)
     plt.ylabel(None)
-    plt.legend(**locs)
+    # plt.legend(**locs)
+    plt.legend(handles=custom_legend_handles, **locs)
     plt.tight_layout()
     plt.grid(linewidth=0.25)
 
@@ -102,7 +145,29 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
     ax2 = plt.subplot(gs[1], sharex=ax1)
 
     # Handling the palette
-    palette = sns.color_palette("bright", len(file_paths))
+    # palette = sns.color_palette("bright", len(file_paths))
+    palette = [(0.6313725490196078, 0.788235294117647, 0.9568627450980393),
+               (0.5529411764705883, 0.8980392156862745, 0.6313725490196078),
+               (1.0, 0.7058823529411765, 0.5098039215686274),
+               (1.0, 0.6235294117647059, 0.6078431372549019),
+               (0.8156862745098039, 0.7333333333333333, 1.0),
+               (0.8705882352941177, 0.7333333333333333, 0.6078431372549019),
+               (0.9803921568627451, 0.6901960784313725, 0.8941176470588236),
+               (0.8117647058823529, 0.8117647058823529, 0.8117647058823529),
+               (1.0, 0.996078431372549, 0.6392156862745098),
+               (0.7254901960784313, 0.9490196078431372, 0.9411764705882353)]
+    markers = ['o', '^', 'd', 'X', 's', 'v', '*', 'p', '<', '>']
+    markers_palette = [(0.00784313725490196, 0.24313725490196078, 1.0),
+                       (0.10196078431372549, 0.788235294117647, 0.2196078431372549),
+                       (1.0, 0.48627450980392156, 0.0),
+                       (0.9098039215686274, 0.0, 0.043137254901960784),
+                       (0.5450980392156862, 0.16862745098039217, 0.8862745098039215),
+                       (0.6235294117647059, 0.2823529411764706, 0.0),
+                       (0.9450980392156862, 0.2980392156862745, 0.7568627450980392),
+                       (0.6392156862745098, 0.6392156862745098, 0.6392156862745098),
+                       (1.0, 0.7686274509803922, 0.0),
+                       (0.0, 0.8431372549019608, 1.0)]
+    custom_legend_handles = []
 
     # Variables to store data for plotting
     max_length = 0
@@ -126,20 +191,60 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
         x_axis = x_axis[:x_max]
 
     for i, (avg_dataset, all_dataset, label) in enumerate(zip(avg_datasets, all_datasets, labels)):
-        color = palette[i]
-
         # Adjust and plot data
         padded_avg_data = np.pad(avg_dataset, (0, max_length - len(avg_dataset)),
                                  'constant', constant_values=np.nan)[:x_max] if x_max else avg_dataset
-        sns.lineplot(x=x_axis, y=padded_avg_data, label=label,
-                     linewidth=0.75, color=color, ax=ax1, legend=False)
-        sns.lineplot(x=x_axis, y=padded_avg_data, label=label,
-                     linewidth=0.75, color=color, ax=ax2)
+
+        x_axis = np.arange(max_length)
+        x_axis = x_axis if x_max == None else x_axis[:x_max]
+
+        # Specify color from the palette
+        color = palette[i]
+        marker = markers[i]
+        marker_color = markers_palette[i]
+
+        # Plot individual data points using Seaborn scatterplot for each data set
         for data_set in all_dataset:
             sns.scatterplot(x=np.arange(len(data_set)), y=data_set,
-                            alpha=0.1, s=20, color=color, legend=False, ax=ax1)
+                            alpha=0.2, s=20, color=color, legend=False, ax=ax1)
             sns.scatterplot(x=np.arange(len(data_set)), y=data_set,
-                            alpha=0.1, s=20, color=color, legend=False, ax=ax2)
+                            alpha=0.2, s=20, color=color, legend=False, ax=ax2)
+
+        # Using pandas to handle NaNs gracefully in lineplot
+        padded_avg_data = padded_avg_data if x_max == None else padded_avg_data[:x_max]
+        df = pd.DataFrame(
+            {'Epoch': x_axis, 'Value': padded_avg_data, 'Group': label})
+
+        sns.lineplot(x='Epoch', y='Value', data=df, style='Group', zorder=2,
+                     dashes=False,
+                     linewidth=0.75, color=marker_color, ax=ax1, legend=False)
+        #  markers=marker, markersize=4, markeredgewidth=0.5)
+
+        # Overlay scatterplot at a reduced frequency for markers
+        # Sampling for marker density
+        sampled_df = df.iloc[[(110+(i)*45) % x_max]]
+        sns.scatterplot(x='Epoch', y='Value', data=sampled_df, zorder=3, ax=ax1,
+                        marker=marker, color=marker_color, s=50, edgecolor='black',
+                        legend=False)
+
+        sns.lineplot(x='Epoch', y='Value', data=df, style='Group', zorder=2,
+                     dashes=False,
+                     linewidth=0.75, color=marker_color, ax=ax2)
+        #  markers=marker, markersize=4, markeredgewidth=0.5)
+
+        # Overlay scatterplot at a reduced frequency for markers
+        # Sampling for marker density
+        sampled_df = df.iloc[[(110+(i)*45) % x_max]]
+        sns.scatterplot(x='Epoch', y='Value', data=sampled_df, zorder=3, ax=ax2,
+                        marker=marker, color=marker_color, s=50, edgecolor='black',
+                        legend=False)
+
+        # Create a custom legend handle for this dataset
+        line = mlines.Line2D([], [], color=marker_color, marker=marker,
+                             linestyle='-', linewidth=0.75,
+                             markersize=6, markeredgecolor='black', markeredgewidth=0.5,
+                             label=label)
+        custom_legend_handles.append(line)
 
     # Apply the break in y-axis between the specified points
     ax1.set_ylim(break_point_end, y_max if y_max is not None else 1.0)
@@ -158,7 +263,8 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
     ax2.plot([0, 1], [1, 1], transform=ax2.transAxes, **kwargs)
 
     # Legend and titles
-    ax2.legend(**locs)
+    # ax2.legend(**locs)
+    ax2.legend(handles=custom_legend_handles, **locs)
     # metric_name = "loss" if metric_index == 0 else "acc"
     # ax1.set_title(f"{metric_name} : {title}")
     # ax2.set_xlabel('Epoch')

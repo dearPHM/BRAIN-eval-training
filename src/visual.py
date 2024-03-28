@@ -62,6 +62,7 @@ def plot_data(category, metric_index, avg_data, all_data, directory_path):
 
     # Plot averaged data
     plt.plot(x_axis, avg_data[metric_index],
+             markers=True,
              label='Average', color='black', linewidth=0.75)
 
     # Plot individual data points
@@ -91,7 +92,8 @@ def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path
 
     # Plot averaged data as a black line using Seaborn
     sns.lineplot(x=x_axis, y=avg_data[metric_index],
-                 label='Average', color='black', linewidth=0.75)
+                 markers=True,
+                 label='Average', color='black', linewidth=0.75, zorder=2)
 
     # Plot individual data points using Seaborn scatterplot for each data set
     for data_set in all_data[metric_index]:

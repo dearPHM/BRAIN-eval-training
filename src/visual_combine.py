@@ -7,7 +7,9 @@ import seaborn as sns
 import pandas as pd
 
 
-def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, title, save_path, fig_size=(4, 4), x_max=None, y_min=0, y_max=None, locs=dict(loc='upper right')):
+def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, title, save_path,
+                                            fig_size=(4, 4), x_max=None, x_mul=20, y_min=0, y_max=None,
+                                            locs=dict(loc='upper right')):
     # plt.figure(figsize=(10, 6))
     plt.figure(figsize=fig_size)
     sns.set_theme(style="ticks")
@@ -45,7 +47,7 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
         df = pd.DataFrame(
             {'Epoch': x_axis, 'Value': padded_avg_data, 'Label': label})
         sns.lineplot(x='Epoch', y='Value', data=df,
-                     label=label, linewidth=0.5, color=color)
+                     label=label, linewidth=0.75, color=color)
 
         # Plot individual data points using Seaborn scatterplot for each data set
         for data_set in all_dataset:
@@ -62,7 +64,14 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
         spine.set_linewidth(0.5)  # Set the linewidth for the axes
         spine.set_color('black')
 
-    metric_name = "loss" if metric_index == 0 else "acc"
+    # Adjusting x-axis labels to display values multiplied by `x_mul`
+    # For example, multiply 20 for 2 quorum * 10 local epochs
+    current_ticks = ax.get_xticks()
+    new_tick_labels = [f"{int(tick)*x_mul}" for tick in current_ticks]
+    plt.xticks(current_ticks[1:len(current_ticks)-1],
+               new_tick_labels[1:len(new_tick_labels)-1])
+
+    # metric_name = "loss" if metric_index == 0 else "acc"
     # plt.title(f"{metric_name}")
     plt.xlabel(None)
     plt.ylabel(None)
@@ -77,7 +86,7 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
 
 
 def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_index, labels, title, save_path,
-                                                           fig_size=(4, 4), x_max=None, y_min=0, y_max=None,
+                                                           fig_size=(4, 4), x_max=None, x_mul=20, y_min=0, y_max=None,
                                                            locs=dict(loc='upper right'), break_point_start=None, break_point_end=None,
                                                            top_subplot_size_ratio=2, bottom_subplot_size_ratio=1):
     # Initialize the figure
@@ -123,9 +132,9 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
         padded_avg_data = np.pad(avg_dataset, (0, max_length - len(avg_dataset)),
                                  'constant', constant_values=np.nan)[:x_max] if x_max else avg_dataset
         sns.lineplot(x=x_axis, y=padded_avg_data, label=label,
-                     linewidth=0.5, color=color, ax=ax1, legend=False)
+                     linewidth=0.75, color=color, ax=ax1, legend=False)
         sns.lineplot(x=x_axis, y=padded_avg_data, label=label,
-                     linewidth=0.5, color=color, ax=ax2)
+                     linewidth=0.75, color=color, ax=ax2)
         for data_set in all_dataset:
             sns.scatterplot(x=np.arange(len(data_set)), y=data_set,
                             alpha=0.1, s=20, color=color, legend=False, ax=ax1)
@@ -150,7 +159,7 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
 
     # Legend and titles
     ax2.legend(**locs)
-    metric_name = "loss" if metric_index == 0 else "acc"
+    # metric_name = "loss" if metric_index == 0 else "acc"
     # ax1.set_title(f"{metric_name} : {title}")
     # ax2.set_xlabel('Epoch')
     # ax1.set_ylabel(metric_name)
@@ -167,6 +176,13 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
         spine.set_linewidth(0.5)  # Set the linewidth for the axes
         spine.set_color('black')
 
+    # Adjusting x-axis labels to display values multiplied by `x_mul`
+    # For example, multiply 20 for 2 quorum * 10 local epochs
+    current_ticks = ax1.get_xticks()
+    new_tick_labels = [f"{int(tick)*x_mul}" for tick in current_ticks]
+    plt.xticks(current_ticks[1:len(current_ticks)-1],
+               new_tick_labels[1:len(new_tick_labels)-1])
+
     # Save the plot
     os.makedirs(save_path, exist_ok=True)
     plot_path = os.path.join(save_path, f"{title}_broken_y_axis.png")
@@ -180,7 +196,6 @@ def expand_data_numpy(data, repeat):
     return expanded_data
 
 
-# TODO: x-axis epochs (x20)
 if __name__ == '__main__':
     plot_directory = './save/avg_objects'
     save_path = './save/combined'
@@ -213,7 +228,7 @@ if __name__ == '__main__':
     ]
     plot_comparison_from_files_with_padding(
         file_paths, metric_index, labels, title, save_path,
-        fig_size=(6, 3.5), x_max=400, y_min=0.49, y_max=0.685,
+        fig_size=(6, 3.5), x_max=400, y_min=0.49, y_max=0.71,
         locs=dict(loc='upper center', ncol=4))
 
     """
@@ -247,30 +262,23 @@ if __name__ == '__main__':
     title = 'Threshold'
     file_paths = [
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.0.pkl',
-        # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.05.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.1.pkl',
-        # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.11.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.12.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.125.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.13.pkl',
-        # f'{plot_directory}/',
+        # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.13.pkl', # TODO
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.2.pkl',
-        # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.3.pkl'
     ]
     labels = [
         '0',
-        # '0.05',
         '0.1',
-        # '0.11',
         '0.12',
         '0.125',
-        '0.13',
-        '0.2',
-        # '0.3'
+        # '0.13', # TODO
+        '0.2'
     ]
     plot_comparison_from_files_with_padding(
         file_paths, metric_index, labels, title, save_path,
-        fig_size=(6, 4), x_max=400, y_min=0.025, y_max=0.725,
+        fig_size=(4, 3.5), x_max=400, y_min=0.025, y_max=0.725,
         locs=dict(loc='upper center', ncol=3))
 
     """

@@ -55,14 +55,14 @@ def load_and_average_files(category, files, load_path, save_path):
 
 
 def plot_data(category, metric_index, avg_data, all_data, directory_path):
-    metric_name = "loss" if metric_index == 0 else "acc"
+    metric_name = "Loss" if metric_index == 0 else "Accuracy"
     x_axis = np.arange(len(avg_data[metric_index]))
 
     plt.figure()
 
     # Plot averaged data
     plt.plot(x_axis, avg_data[metric_index],
-             label='Average', color='black', linewidth=1)
+             label='Average', color='black', linewidth=0.75)
 
     # Plot individual data points
     for data_set in all_data[metric_index]:
@@ -70,11 +70,11 @@ def plot_data(category, metric_index, avg_data, all_data, directory_path):
                     data_set, color='black', alpha=0.1, s=20)
 
     plt.title(f"{metric_name} for {category}")
-    plt.xlabel('Epoch')
+    plt.xlabel('Round')
     plt.ylabel(metric_name)
     plt.legend()
     plt.tight_layout()
-    plt.grid(linewidth=0.5)
+    plt.grid(linewidth=0.25)
 
     plt.savefig(
         f"{directory_path}/{len(all_data[metric_index])}_{category}_{metric_name}.png")
@@ -82,7 +82,7 @@ def plot_data(category, metric_index, avg_data, all_data, directory_path):
 
 
 def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path):
-    metric_name = "loss" if metric_index == 0 else "acc"
+    metric_name = "Loss" if metric_index == 0 else "Accuracy"
     x_axis = np.arange(len(avg_data[metric_index]))
 
     # plt.figure(figsize=(10, 6))
@@ -91,7 +91,7 @@ def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path
 
     # Plot averaged data as a black line using Seaborn
     sns.lineplot(x=x_axis, y=avg_data[metric_index],
-                 label='Average', color='black', linewidth=1)
+                 label='Average', color='black', linewidth=0.75)
 
     # Plot individual data points using Seaborn scatterplot for each data set
     for data_set in all_data[metric_index]:
@@ -99,15 +99,17 @@ def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path
                         y=data_set, color='black', alpha=0.1, s=20)
 
     plt.title(f"{metric_name} for {category}")
-    plt.xlabel('Epoch')
+    plt.xlabel('Round')
     plt.ylabel(metric_name)
     plt.legend()
+    plt.tight_layout()
+    plt.grid(linewidth=0.25)
+
     plt.savefig(
         f"{directory_path}/{len(all_data[metric_index])}_{category}_{metric_name}.png")
     plt.close()
 
 
-# TODO: x-axis epochs (x20)
 if __name__ == '__main__':
     pkl_path = './save/objects'
     avg_pkl_path = './save/avg_objects'

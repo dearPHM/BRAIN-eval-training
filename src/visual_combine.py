@@ -219,7 +219,6 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
                      dashes=False,
                      linewidth=0.75, color=marker_color, ax=ax1, legend=False)
         #  markers=marker, markersize=4, markeredgewidth=0.5)
-
         # Overlay scatterplot at a reduced frequency for markers
         # Sampling for marker density
         sampled_df = df.iloc[[(110+(i)*45) % x_max]]
@@ -231,7 +230,6 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
                      dashes=False,
                      linewidth=0.75, color=marker_color, ax=ax2)
         #  markers=marker, markersize=4, markeredgewidth=0.5)
-
         # Overlay scatterplot at a reduced frequency for markers
         # Sampling for marker density
         sampled_df = df.iloc[[(110+(i)*45) % x_max]]
@@ -271,6 +269,10 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
     # ax1.set_ylabel(metric_name)
     # ax2.set_ylabel(metric_name)
     plt.subplots_adjust(hspace=0.0)  # Adjust space between subplots
+    ax1.set_xlabel(None)
+    ax1.set_ylabel(None)
+    ax2.set_xlabel(None)
+    ax2.set_ylabel(None)
     plt.tight_layout()
     ax1.grid(linewidth=0.25)
     ax2.grid(linewidth=0.25)

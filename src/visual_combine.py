@@ -23,8 +23,8 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
                (1.0, 0.7058823529411765, 0.5098039215686274),
                (1.0, 0.6235294117647059, 0.6078431372549019),
                (0.8156862745098039, 0.7333333333333333, 1.0),
-               (0.8705882352941177, 0.7333333333333333, 0.6078431372549019),
                (0.9803921568627451, 0.6901960784313725, 0.8941176470588236),
+               (0.8705882352941177, 0.7333333333333333, 0.6078431372549019),
                (0.8117647058823529, 0.8117647058823529, 0.8117647058823529),
                (1.0, 0.996078431372549, 0.6392156862745098),
                (0.7254901960784313, 0.9490196078431372, 0.9411764705882353)]
@@ -34,8 +34,8 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
                        (1.0, 0.48627450980392156, 0.0),
                        (0.9098039215686274, 0.0, 0.043137254901960784),
                        (0.5450980392156862, 0.16862745098039217, 0.8862745098039215),
-                       (0.6235294117647059, 0.2823529411764706, 0.0),
                        (0.9450980392156862, 0.2980392156862745, 0.7568627450980392),
+                       (0.6235294117647059, 0.2823529411764706, 0.0),
                        (0.6392156862745098, 0.6392156862745098, 0.6392156862745098),
                        (1.0, 0.7686274509803922, 0.0),
                        (0.0, 0.8431372549019608, 1.0)]
@@ -138,7 +138,8 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
 
     # Create a gridspec with two rows of different heights
     gs = gridspec.GridSpec(2, 1, height_ratios=[
-                           top_subplot_size_ratio, bottom_subplot_size_ratio])
+                           top_subplot_size_ratio, bottom_subplot_size_ratio],
+                           hspace=0.0, wspace=0)
 
     # Create two subplots with the specified size ratios
     ax1 = plt.subplot(gs[0])
@@ -151,8 +152,8 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
                (1.0, 0.7058823529411765, 0.5098039215686274),
                (1.0, 0.6235294117647059, 0.6078431372549019),
                (0.8156862745098039, 0.7333333333333333, 1.0),
-               (0.8705882352941177, 0.7333333333333333, 0.6078431372549019),
                (0.9803921568627451, 0.6901960784313725, 0.8941176470588236),
+               (0.8705882352941177, 0.7333333333333333, 0.6078431372549019),
                (0.8117647058823529, 0.8117647058823529, 0.8117647058823529),
                (1.0, 0.996078431372549, 0.6392156862745098),
                (0.7254901960784313, 0.9490196078431372, 0.9411764705882353)]
@@ -162,8 +163,8 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
                        (1.0, 0.48627450980392156, 0.0),
                        (0.9098039215686274, 0.0, 0.043137254901960784),
                        (0.5450980392156862, 0.16862745098039217, 0.8862745098039215),
-                       (0.6235294117647059, 0.2823529411764706, 0.0),
                        (0.9450980392156862, 0.2980392156862745, 0.7568627450980392),
+                       (0.6235294117647059, 0.2823529411764706, 0.0),
                        (0.6392156862745098, 0.6392156862745098, 0.6392156862745098),
                        (1.0, 0.7686274509803922, 0.0),
                        (0.0, 0.8431372549019608, 1.0)]
@@ -254,11 +255,15 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
                     top=False, labelbottom=False)
 
     # Broken axis marks
+    ax1.axhline(y=break_point_end+0.0003,
+                color='lightgray', linewidth=1, zorder=1)
     d = .25  # proportion of vertical to horizontal extent of the slanted line
-    kwargs = dict(marker=[(-1, -d), (1, d)], markersize=12,
+    kwargs = dict(marker=[(-1, -d), (1, d)], markersize=10,
                   linestyle="none", color='k', mec='k', mew=1, clip_on=False)
-    ax1.plot([0, 1], [0, 0], transform=ax1.transAxes, **kwargs)
-    ax2.plot([0, 1], [1, 1], transform=ax2.transAxes, **kwargs)
+    ax1.plot([0, 1], [0+0.03*bottom_subplot_size_ratio/(top_subplot_size_ratio+bottom_subplot_size_ratio), 0+0.03 *
+             bottom_subplot_size_ratio/(top_subplot_size_ratio+bottom_subplot_size_ratio)], transform=ax1.transAxes, zorder=3, **kwargs)
+    ax2.plot([0, 1], [1-0.03*top_subplot_size_ratio/(top_subplot_size_ratio+bottom_subplot_size_ratio), 1-0.03 *
+             top_subplot_size_ratio/(top_subplot_size_ratio+bottom_subplot_size_ratio)], transform=ax2.transAxes, zorder=3, **kwargs)
 
     # Legend and titles
     # ax2.legend(**locs)
@@ -336,8 +341,8 @@ if __name__ == '__main__':
     ]
     plot_comparison_from_files_with_padding(
         file_paths, metric_index, labels, title, save_path,
-        fig_size=(6, 3.5), x_max=400, y_min=0.49, y_max=0.71,
-        locs=dict(loc='upper center', ncol=4))
+        fig_size=(4, 3.5), x_max=400, y_min=0.425, y_max=0.725,
+        locs=dict(loc='upper center', ncol=2))
 
     """
     2. Byzantine (x5)
@@ -361,7 +366,7 @@ if __name__ == '__main__':
             file_paths, metric_index, labels, title, save_path,
             fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
             locs=dict(loc='upper right'), break_point_start=0.225, break_point_end=0.485,
-            top_subplot_size_ratio=3, bottom_subplot_size_ratio=2)
+            top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
 
     """
     3. Threshold
@@ -373,16 +378,16 @@ if __name__ == '__main__':
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.1.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.12.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.125.pkl',
-        # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.13.pkl', # TODO
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.13.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.2.pkl',
     ]
     labels = [
-        '0',
-        '0.1',
-        '0.12',
+        '0.000',
+        '0.100',
+        '0.120',
         '0.125',
-        # '0.13', # TODO
-        '0.2'
+        '0.130',
+        '0.200'
     ]
     plot_comparison_from_files_with_padding(
         file_paths, metric_index, labels, title, save_path,
@@ -394,38 +399,37 @@ if __name__ == '__main__':
     - Byzantine 0: 0 / 5 / 10 / 11 / 15
     - Byzantine 5: 0 / 5 / 10 / 11 / 15
     """
-    for b in [0]:  # TODO: 5
-        title = f'Score_Byzantine_@_Z{b}'
-        file_paths = [
-            # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ0_D0.55_W4_S4_TH0.0.pkl',
-            f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ5_D0.55_W4_S4_TH0.0.pkl',
-            f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ10_D0.55_W4_S4_TH0.0.pkl',
-            f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ11_D0.55_W4_S4_TH0.0.pkl',
-            f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ15_D0.55_W4_S4_TH0.0.pkl'
-        ]
-        labels = [
-            # '0',
-            '5',
-            '10',
-            '11',
-            '15'
-        ]
-        plot_comparison_with_broken_y_axis_and_different_sizes(
-            file_paths, metric_index, labels, title, save_path,
-            fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
-            locs=dict(loc='upper right', ncol=2), break_point_start=0.225, break_point_end=0.485,
-            top_subplot_size_ratio=3, bottom_subplot_size_ratio=2)
+    # 0
+    title = f'Score_Byzantine_@_Z{0}'
+    file_paths = [
+        # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ0_D0.55_W4_S4_TH0.0.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ5_D0.55_W4_S4_TH0.0.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ10_D0.55_W4_S4_TH0.0.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ11_D0.55_W4_S4_TH0.0.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ15_D0.55_W4_S4_TH0.0.pkl'
+    ]
+    labels = [
+        # '0',
+        '5',
+        '10',
+        '11',
+        '15'
+    ]
+    plot_comparison_with_broken_y_axis_and_different_sizes(
+        file_paths, metric_index, labels, title, save_path,
+        fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
+        locs=dict(loc='upper right', ncol=2), break_point_start=0.225, break_point_end=0.485,
+        top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
 
-    # TODO: remove
+    # 5
     # TODO: TH = 0.125
-    # TODO: check Z5 SZ10 case
     title = f'Score_Byzantine_@_Z{5}'
     file_paths = [
         # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ0_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ5_D1.0_W4_S4_TH0.12.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D1.0_W4_S4_TH0.125.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ11_D1.0_W4_S4_TH0.125.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ15_D1.0_W4_S4_TH0.125.pkl'
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ5_D1.0_W4_S4_TH0.12.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ10_D1.0_W4_S4_TH0.145.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ11_D1.0_W4_S4_TH0.125.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ15_D1.0_W4_S4_TH0.125.pkl'
     ]
     labels = [
         # '0',
@@ -441,7 +445,7 @@ if __name__ == '__main__':
         locs=dict(loc='lower right', bbox_to_anchor=(1.0, 0.5), ncol=2))
     # locs=dict(loc='upper right', ncol=2),
     # break_point_start=0.225, break_point_end=0.485,
-    # top_subplot_size_ratio=3, bottom_subplot_size_ratio=2)
+    # top_subplot_size_rati7=5, bottom_subplot_size_ratio=4)
 
     """
     5. Staleness (X2)

@@ -155,15 +155,25 @@ if __name__ == "__main__":
 
     # Separating edges into two groups: straight edges and arc edges
     straight_edges = [(u, v) for u, v in G.edges() if u in gids and v in gids]
+    # Assuming gids are where you want dashed lines
+
     arc_edges = [(u, v) for u, v in G.edges() if not (u in gids and v in gids)]
+
+    dashed_edges = [(u, v)
+                    for u, v in G.edges() if (u in gids and v not in gids)]
+    normal_edges = [(u, v)
+                    for u, v in G.edges() if (u not in gids and v in gids)]
 
     # Draw straight edges with default connection style (straight lines)
     nx.draw_networkx_edges(G, pos, ax=ax, edgelist=straight_edges,
                            arrows=True, arrowstyle='->', arrowsize=10, width=2, edge_color=gid_colors)
 
     # Draw arc edges with arc connection style
-    nx.draw_networkx_edges(G, pos, ax=ax, edgelist=arc_edges, arrows=True,
-                           arrowstyle='->', arrowsize=10, connectionstyle='arc3,rad=0.1')
+    nx.draw_networkx_edges(G, pos, ax=ax, edgelist=dashed_edges,
+                           arrows=True, arrowstyle='->', arrowsize=10, connectionstyle='arc3,rad=0.1',
+                           width=0.5, edge_color='gray', style='dashed')
+    nx.draw_networkx_edges(G, pos, ax=ax, edgelist=normal_edges,
+                           arrows=True, arrowstyle='->', arrowsize=10, connectionstyle='arc3,rad=0.1')
 
     # ax.set_title("Model DAG")
     plt.axis('off')  # Hide axes for better visualization
@@ -178,7 +188,7 @@ if __name__ == "__main__":
                title="Staleness")
 
     fig.tight_layout()
-    plt.savefig("./save/DAG.png", bbox_inches='tight')
+    plt.savefig("./save/DAG.png", bbox_inches='tight', dpi=300)
     plt.close()
 
     # Find nodes with more than 2 incoming edges

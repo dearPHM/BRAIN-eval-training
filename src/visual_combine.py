@@ -123,7 +123,7 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
     plt.grid(linewidth=0.25)
 
     plot_path = os.path.join(save_path, f"{title}.png")
-    plt.savefig(plot_path)
+    plt.savefig(plot_path, bbox_inches='tight', dpi=300)
     plt.close()
     print(f"Plot saved to {plot_path}")
 
@@ -299,7 +299,7 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
     # Save the plot
     os.makedirs(save_path, exist_ok=True)
     plot_path = os.path.join(save_path, f"{title}_broken_y_axis.png")
-    plt.savefig(plot_path, bbox_inches='tight')
+    plt.savefig(plot_path, bbox_inches='tight', dpi=300)
     plt.close()
     print(f"Plot saved to {plot_path}")
 
@@ -310,6 +310,8 @@ def expand_data_numpy(data, repeat):
 
 
 if __name__ == '__main__':
+    # TODO: check accuracy in non-iid case (and with unequal)
+
     plot_directory = './save/avg_objects'
     save_path = './save/combined'
     metric_index = 1  # 0 for "loss", 1 for "acc"
@@ -341,7 +343,8 @@ if __name__ == '__main__':
     ]
     plot_comparison_from_files_with_padding(
         file_paths, metric_index, labels, title, save_path,
-        fig_size=(4, 3.5), x_max=400, y_min=0.425, y_max=0.725,
+        # fig_size=(4, 3.5), x_max=400, y_min=0.425, y_max=0.725,
+        fig_size=(4, 3.5), x_max=400,
         locs=dict(loc='upper center', ncol=2))
 
     """
@@ -350,7 +353,7 @@ if __name__ == '__main__':
     - FedAsync: 0 / 5 / 10 / 11 / 15
     - FedAvg:   0 / 5 / 10 / 11 / 15
     """
-    for b, th in zip([0, 5, 10, 11, 15], [0.0, 0.125, 0.125, 0.12, 0.125]):  # TODO: TH = 0.125
+    for b, th in zip([0, 5, 10, 11, 15], [0.0, 0.125, 0.125, 0.125, 0.125]):
         title = f'Byzantine_{b}'
         file_paths = [
             f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ0_D0.55_W4_S4_TH{th}.pkl',
@@ -379,7 +382,7 @@ if __name__ == '__main__':
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.12.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.125.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.13.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.2.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.2.pkl'
     ]
     labels = [
         '0.000',
@@ -391,7 +394,8 @@ if __name__ == '__main__':
     ]
     plot_comparison_from_files_with_padding(
         file_paths, metric_index, labels, title, save_path,
-        fig_size=(4, 3.5), x_max=400, y_min=0.025, y_max=0.725,
+        # fig_size=(4, 3.5), x_max=400, y_min=0.025, y_max=0.725,
+        fig_size=(4, 3.5), x_max=400, y_max=0.8,
         locs=dict(loc='upper center', ncol=3))
 
     """
@@ -402,14 +406,14 @@ if __name__ == '__main__':
     # 0
     title = f'Score_Byzantine_@_Z{0}'
     file_paths = [
-        # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ0_D0.55_W4_S4_TH0.0.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ0_D0.55_W4_S4_TH0.0.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ5_D0.55_W4_S4_TH0.0.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ10_D0.55_W4_S4_TH0.0.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ11_D0.55_W4_S4_TH0.0.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ15_D0.55_W4_S4_TH0.0.pkl'
     ]
     labels = [
-        # '0',
+        '0',
         '5',
         '10',
         '11',
@@ -422,17 +426,16 @@ if __name__ == '__main__':
         top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
 
     # 5
-    # TODO: TH = 0.125
     title = f'Score_Byzantine_@_Z{5}'
     file_paths = [
-        # f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ0_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ5_D1.0_W4_S4_TH0.12.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ0_D0.55_W4_S4_TH0.125.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ5_D1.0_W4_S4_TH0.145.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ10_D1.0_W4_S4_TH0.145.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ11_D1.0_W4_S4_TH0.125.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ15_D1.0_W4_S4_TH0.125.pkl'
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ11_D1.0_W4_S4_TH0.145.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ15_D1.0_W4_S4_TH0.145.pkl'
     ]
     labels = [
-        # '0',
+        '0',
         '5',
         '10',
         '11',
@@ -495,6 +498,24 @@ if __name__ == '__main__':
     """
     6. Quorum
     - Byzantine: 5
-    - Score Byzantine: 5 / 10
-    - Diff (Quorum): 0.25 (5) / 0.50 (10) / 0.55 (11) / 0.75 (15) / 0.99 (20)
+    - Score Byzantine: 10
+    - Diff (Quorum): 0.25 (5) / [0.50 (10)] 0.55 (11) / 0.75 (15) / [0.99 (20)] 1.0 (21)
     """
+    title = f'Quorum'
+    file_paths = [
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.25_W4_S4_TH0.145.pkl',
+        # TODO: 0.55
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.5_W4_S4_TH0.145.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.75_W4_S4_TH0.145.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D1.0_W4_S4_TH0.145.pkl'
+    ]
+    labels = [
+        '0.25',
+        '0.5',  # TODO: 0.55
+        '0.75',
+        '1.0'
+    ]
+    plot_comparison_from_files_with_padding(
+        file_paths, metric_index, labels, title, save_path,
+        fig_size=(4, 3.5), x_max=400, y_max=0.8,
+        locs=dict(loc='upper center', ncol=2))

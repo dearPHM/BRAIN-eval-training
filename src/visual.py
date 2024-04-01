@@ -78,7 +78,8 @@ def plot_data(category, metric_index, avg_data, all_data, directory_path):
     plt.grid(linewidth=0.25)
 
     plt.savefig(
-        f"{directory_path}/{len(all_data[metric_index])}_{category}_{metric_name}.png")
+        f"{directory_path}/{len(all_data[metric_index])}_{category}_{metric_name}.png",
+        bbox_inches='tight', dpi=300)
     plt.close()
 
 
@@ -108,7 +109,8 @@ def plot_data_seaborn(category, metric_index, avg_data, all_data, directory_path
     plt.grid(linewidth=0.25)
 
     plt.savefig(
-        f"{directory_path}/{len(all_data[metric_index])}_{category}_{metric_name}.png")
+        f"{directory_path}/{len(all_data[metric_index])}_{category}_{metric_name}.png",
+        bbox_inches='tight', dpi=300)
     plt.close()
 
 

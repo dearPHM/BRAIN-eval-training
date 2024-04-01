@@ -18,7 +18,7 @@ $ python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --n
 
 # Visualization
 
-Do multiple run (ex. 100) then draw dot graph.
+- Do multiple run (ex. 100) to draw dots well.
 
 ```bash
 # Acc & Loss

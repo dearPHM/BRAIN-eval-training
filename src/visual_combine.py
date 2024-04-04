@@ -368,7 +368,7 @@ if __name__ == '__main__':
         plot_comparison_with_broken_y_axis_and_different_sizes(
             file_paths, metric_index, labels, title, save_path,
             fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
-            locs=dict(loc='upper right'), break_point_start=0.225, break_point_end=0.485,
+            locs=dict(loc='upper right'), break_point_start=0.225, break_point_end=0.435,
             top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
 
     """
@@ -407,10 +407,10 @@ if __name__ == '__main__':
     title = f'Score_Byzantine_@_Z{0}'
     file_paths = [
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ0_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ5_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ10_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ11_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ15_D0.55_W4_S4_TH0.0.pkl'
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ5_D1.0_W4_S4_TH0.0.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ10_D1.0_W4_S4_TH0.0.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ11_D1.0_W4_S4_TH0.0.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ15_D1.0_W4_S4_TH0.0.pkl'
     ]
     labels = [
         '0',
@@ -504,14 +504,13 @@ if __name__ == '__main__':
     title = f'Quorum'
     file_paths = [
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.25_W4_S4_TH0.145.pkl',
-        # TODO: 0.55
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.5_W4_S4_TH0.145.pkl',
+        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.55_W4_S4_TH0.145.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.75_W4_S4_TH0.145.pkl',
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D1.0_W4_S4_TH0.145.pkl'
     ]
     labels = [
         '0.25',
-        '0.5',  # TODO: 0.55
+        '0.55',
         '0.75',
         '1.0'
     ]

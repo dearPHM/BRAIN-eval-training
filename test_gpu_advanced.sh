@@ -1,3 +1,5 @@
+mkdir results
+
 # Baseline - SGD
 # python src/baseline_main.py --model=cnn --dataset=cifar --epochs=200 --verbose=0 --local_bs=50 --gpu=0
 

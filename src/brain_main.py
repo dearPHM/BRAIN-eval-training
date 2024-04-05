@@ -9,6 +9,7 @@ import time
 import pickle
 import numpy as np
 import statistics
+import csv
 from tqdm import tqdm
 
 import torch
@@ -25,6 +26,7 @@ from moving_average import MovingAverage
 
 if __name__ == '__main__':
     start_time = time.time()
+    traning_times = []
 
     # define paths
     path_project = os.path.abspath('.')
@@ -101,11 +103,16 @@ if __name__ == '__main__':
                 if idx >= args.byzantines:
                     local_model = LocalUpdate(args=args, dataset=train_dataset,
                                               idxs=user_groups[idx], logger=logger)
+                    traning_start = time.time()
                 else:
                     local_model = ByzantineLocalUpdate(args=args, dataset=train_dataset,
                                                        idxs=user_groups[idx], logger=logger)
+
                 w, loss = local_model.update_weights(
                     model=copy.deepcopy(global_model), global_round=epoch)
+                if idx >= args.byzantines:
+                    traning_times.append(time.time() - traning_start)
+
                 # local_weights.append(copy.deepcopy(w))
                 cache.add_item_with_random_counter(copy.deepcopy(w))
 
@@ -195,6 +202,11 @@ if __name__ == '__main__':
         pickle.dump([test_loss_collect, test_acc_collect], f)
 
     print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
+    print(f'\n Avg Training Time: {np.median(np.array(traning_times))}')
+    file_path = './results/times.csv'
+    with open(file_path, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(traning_times)
 
     # PLOTTING (optional)
     import matplotlib

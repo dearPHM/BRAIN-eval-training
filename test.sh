@@ -1,3 +1,5 @@
+mkdir results
+
 python src/baseline_main.py --model=cnn --dataset=cifar --epochs=200 --verbose=0 --local_bs=50
 
 python src/federated_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --frac=0.1 --verbose=0 --local_bs=50

@@ -509,10 +509,10 @@ if __name__ == '__main__':
         f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D1.0_W4_S4_TH0.145.pkl'
     ]
     labels = [
-        '0.25',
-        '0.55',
-        '0.75',
-        '1.0'
+        '5',
+        '11',
+        '15',
+        '21'
     ]
     plot_comparison_from_files_with_padding(
         file_paths, metric_index, labels, title, save_path,

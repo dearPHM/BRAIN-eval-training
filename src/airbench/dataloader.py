@@ -52,6 +52,7 @@ def batch_crop(images, crop_size):
 class CifarLoader:
 
     def __init__(self, dataset, train=True, batch_size=500, aug=None, drop_last=None, shuffle=None, gpu=0):
+        device = torch.device(gpu)
         # data_path = os.path.join(path, 'train.pt' if train else 'test.pt')
         # if not os.path.exists(data_path):
         #     dset = torchvision.datasets.CIFAR10(
@@ -62,8 +63,8 @@ class CifarLoader:
         #                'classes': dset.classes}, data_path)
         # data = torch.load(data_path, map_location=torch.device(gpu))
         # self.images, self.labels, self.classes = data['images'], data['labels'], data['classes']
-        self.images, self.labels, self.classes = torch.tensor(dataset.data, device=torch.device(
-            gpu)), torch.tensor(dataset.targets, device=torch.device(gpu)), dataset.classes
+        self.images, self.labels, self.classes = torch.tensor(
+            dataset.data, device=device), torch.tensor(dataset.targets, device=device), dataset.classes
         # It's faster to load+process uint8 data than to load preprocessed fp16 data
         self.images = (self.images.half() / 255).permute(0, 3,
                                                          1, 2).to(memory_format=torch.channels_last)

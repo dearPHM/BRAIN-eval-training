@@ -44,42 +44,12 @@ def print_training_details(variables, is_final_entry):
 
 
 if __name__ == "__main__":
-    hyp = {
-        'opt': {
-            'train_epochs': 9.9,
-            'batch_size': 1024,
-            'lr': 11.5,                 # learning rate per 1024 examples
-            'momentum': 0.85,
-            # weight decay per 1024 examples (decoupled from learning rate)
-            'weight_decay': 0.0153,
-            # scales up learning rate (but not weight decay) for BatchNorm biases
-            'bias_scaler': 64.0,
-            'label_smoothing': 0.2,
-            # how many epochs to train the whitening layer bias before freezing
-            'whiten_bias_epochs': 3,
-        },
-        'aug': {
-            'flip': True,
-            'translate': 2,
-        },
-        'net': {
-            'widths': {
-                'block1': 64,
-                'block2': 256,
-                'block3': 256,
-            },
-            'batchnorm_momentum': 0.6,
-            'scaling_factor': 1/9,
-            # the level of test-time augmentation: 0=none, 1=mirror, 2=mirror+translate
-            'tta_level': 2,
-        },
-    }
-
+    from hyperparameters import hyp
     # print_columns(logging_columns_list, is_head=True)
 
     # Set Params
     batch_size = hyp['opt']['batch_size']
-    epochs = hyp['opt']['train_epochs']
+    epochs = 9.9  # Hardcoded
     momentum = hyp['opt']['momentum']
     # Assuming gradients are constant in time, for Nesterov momentum, the below ratio is how much
     # larger the default steps will be than the underlying per-example gradients. We divide the
@@ -87,7 +57,7 @@ if __name__ == "__main__":
     # of the choice of momentum.
     kilostep_scale = 1024 * (1 + 1 / (1 - momentum))
     # un-decoupled learning rate for PyTorch SGD
-    lr = hyp['opt']['lr'] / kilostep_scale
+    lr = 11.5 / kilostep_scale  # Hardcoded
     wd = hyp['opt']['weight_decay'] * batch_size / kilostep_scale
     lr_biases = lr * hyp['opt']['bias_scaler']
     label_smoothing = hyp['opt']['label_smoothing']
@@ -108,9 +78,9 @@ if __name__ == "__main__":
     # test_loader = CifarLoader(
     #     'cifar10',
     #     train=False, batch_size=2000)
-    train_loader = CifarLoader(torchvision.datasets.CIFAR10('cifar10', download=True, train=True),
+    train_loader = CifarLoader(torchvision.datasets.CIFAR10('./data/cifar10', download=True, train=True),
                                train=True, batch_size=batch_size, aug=hyp['aug'])
-    test_loader = CifarLoader(torchvision.datasets.CIFAR10('cifar10', download=True, train=False),
+    test_loader = CifarLoader(torchvision.datasets.CIFAR10('./data/cifar10', download=True, train=False),
                               train=False, batch_size=2000)
 
     # Run

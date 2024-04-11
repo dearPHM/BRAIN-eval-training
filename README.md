@@ -1,6 +1,6 @@
 # TL;DR
 
-# Methods
+## Methods
 
 ```bash
 # SGD (single-thread)
@@ -16,7 +16,7 @@ $ python src/fedAsync_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 
 $ python src/brain_main.py --model=cnn --dataset=cifar --iid=1 --epochs=1000 --num_users=21 --byzantines=0 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.0 --verbose=0 --local_bs=50 --gpu=0
 ```
 
-# Visualization
+## Visualization
 
 - Do multiple run (ex. 100) to draw dots well.
 
@@ -31,11 +31,15 @@ $ python src/visual_combine.py
 $ python src/cache.py
 ```
 
-# Test
+## Test
 
 ```bash
 $ pytest src/test_cache.py
 ```
+
+# References
+
+- CNN Model Implementation: [cifar10-airbench](https://github.com/KellerJordan/cifar10-airbench)
 
 ---
 

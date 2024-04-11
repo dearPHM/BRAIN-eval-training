@@ -379,24 +379,24 @@ if __name__ == '__main__':
 
         """
         3. Threshold
-        - 0.000 / 0.200 / 0.400 / 0.500 / 0.600 / 0.700
+        - 0.000 / 0.200 / 0.300 / 0.400 / 0.500 / 0.600
         """
         title = 'Threshold'
         file_paths = [
             f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.0.pkl',
             f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.3.pkl',
             f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.4.pkl',
             f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.5.pkl',
-            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.6.pkl',
-            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.7.pkl'
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.6.pkl'
         ]
         labels = [
             '0.000',
             '0.200',
+            '0.300',
             '0.400',
             '0.500',
-            '0.600',
-            '0.700'
+            '0.600'
         ]
         plot_comparison_from_files_with_padding(
             file_paths, metric_index, labels, title, save_path,

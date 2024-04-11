@@ -29,10 +29,10 @@ for i in $(seq 1 10); do
         # Threshold
         python src/brain_main.py --iid=${IID} --epochs=200 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.0 --verbose=0
         # python src/brain_main.py --iid=${IID} --epochs=200 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.2 --verbose=0
+        python src/brain_main.py --iid=${IID} --epochs=200 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.3 --verbose=0
         python src/brain_main.py --iid=${IID} --epochs=200 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.4 --verbose=0
         python src/brain_main.py --iid=${IID} --epochs=200 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.5 --verbose=0
         python src/brain_main.py --iid=${IID} --epochs=200 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.6 --verbose=0
-        python src/brain_main.py --iid=${IID} --epochs=200 --byzantines=10 --score_byzantines=0 --frac=0.1 --stale=4 --diff=0.55 --window=4 --threshold=0.7 --verbose=0
 
         # Score Byzantine
         # ## Byzantine 0

@@ -33,22 +33,22 @@ def args_parser():
                         help="number of Byzantine users who submit random score: SZ")
 
     # model arguments
-    parser.add_argument('--model', type=str, default='mlp', help='model name')
+    parser.add_argument('--model', type=str, default='cnn', help='model name')
     # parser.add_argument('--norm', type=str, default='batch_norm',
     #                     help="batch_norm, layer_norm, or None")
 
     # other arguments
-    parser.add_argument('--dataset', type=str, default='mnist', help="name \
+    parser.add_argument('--dataset', type=str, default='cifar', help="name \
                         of dataset")
     parser.add_argument('--num_classes', type=int, default=10, help="number \
                         of classes")
     parser.add_argument('--gpu', type=int, default=None, help="To use cuda, set \
                         to a specific GPU ID. Default set to use CPU.")
-    parser.add_argument('--epochs', type=int, default=10,
+    parser.add_argument('--epochs', type=int, default=10,  # 400
                         help="number of rounds of training")
     parser.add_argument('--local_ep', type=int, default=10,
                         help="the number of local epochs: E")
-    parser.add_argument('--local_bs', type=int, default=50,
+    parser.add_argument('--local_bs', type=int, default=1024,  # 50
                         help="local batch size: B")
     parser.add_argument('--lr', type=float, default=0.001,
                         help='learning rate')

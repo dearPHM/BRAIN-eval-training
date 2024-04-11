@@ -77,8 +77,8 @@ if __name__ == '__main__':
     print(f'test acc: {test_acc}, test_loss: {test_loss}')
 
     # Saving the objects:
-    file_name = './save/objects/nn_{}_{}_{}_iid{}_{}.pkl'.\
-        format(args.dataset, args.model, args.epochs, args.iid, time.time())
+    file_name = './save/objects/nn_{}_{}_{}_{}.pkl'.\
+        format(args.dataset, args.model, args.epochs, time.time())
     with open(file_name, 'wb') as f:
         pickle.dump([train_loss_collect, test_acc_collect], f)
 
@@ -95,8 +95,8 @@ if __name__ == '__main__':
     plt.plot(range(len(train_loss_collect)), train_loss_collect, color='r')
     plt.ylabel('Training loss')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/nn_{}_{}_{}_train_loss.png'.format(args.dataset, args.model,
-                                                           args.epochs, args.iid))
+    plt.savefig('./save/nn_{}_{}_train_loss.png'.format(args.dataset, args.model,
+                                                        args.epochs))
 
     # Plot Average Accuracy vs Communication rounds
     plt.figure()
@@ -104,8 +104,8 @@ if __name__ == '__main__':
     plt.plot(range(len(train_acc_collect)), test_acc_collect, color='k')
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/nn_{}_{}_{}_train_acc.png'.format(args.dataset, args.model,
-                                                          args.epochs, args.iid,))
+    plt.savefig('./save/nn_{}_{}_train_acc.png'.format(args.dataset, args.model,
+                                                       args.epochs))
 
     # Plot Average Accuracy vs Communication rounds
     plt.figure()
@@ -113,5 +113,5 @@ if __name__ == '__main__':
     plt.plot(range(len(test_acc_collect)), test_acc_collect, color='k')
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/nn_{}_{}_{}_test_acc.png'.format(args.dataset, args.model,
-                                                         args.epochs, args.iid,))
+    plt.savefig('./save/nn_{}_{}_test_acc.png'.format(args.dataset, args.model,
+                                                      args.epochs))

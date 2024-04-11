@@ -72,7 +72,7 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
         for data_set in all_dataset:
             data_set = data_set if x_max == None else data_set[:x_max]
             sns.scatterplot(x=np.arange(len(data_set)),
-                            y=data_set, alpha=0.2, s=20, color=color, legend=False)
+                            y=data_set, alpha=0.1, s=20, color=color, legend=False)
 
         # Using pandas to handle NaNs gracefully in lineplot
         padded_avg_data = padded_avg_data if x_max == None else padded_avg_data[:x_max]
@@ -207,9 +207,9 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
         # Plot individual data points using Seaborn scatterplot for each data set
         for data_set in all_dataset:
             sns.scatterplot(x=np.arange(len(data_set)), y=data_set,
-                            alpha=0.2, s=20, color=color, legend=False, ax=ax1)
+                            alpha=0.1, s=20, color=color, legend=False, ax=ax1)
             sns.scatterplot(x=np.arange(len(data_set)), y=data_set,
-                            alpha=0.2, s=20, color=color, legend=False, ax=ax2)
+                            alpha=0.1, s=20, color=color, legend=False, ax=ax2)
 
         # Using pandas to handle NaNs gracefully in lineplot
         padded_avg_data = padded_avg_data if x_max == None else padded_avg_data[:x_max]
@@ -310,211 +310,234 @@ def expand_data_numpy(data, repeat):
 
 
 if __name__ == '__main__':
-    # TODO: check accuracy in non-iid case (and with unequal)
-
     plot_directory = './save/avg_objects'
-    save_path = './save/combined'
     metric_index = 1  # 0 for "loss", 1 for "acc"
 
-    """
-    1. Performance
-    """
-    multiplier = 5  # expand 200 -> 1000
-    with open(f'{plot_directory}/nn_cifar_cnn_iid1.pkl', 'rb') as file:
-        data = pickle.load(file)
-        extended_avg_sgd = expand_data_numpy(data[0], multiplier)
-        extended_all_sgd = [expand_data_numpy(d, multiplier) for d in data[1]]
+    for iid in [1, 0]:
+        save_path = './save/combined/iid' if iid == 1 else './save/combined/non_iid'
 
-    with open(f'{plot_directory}/nn_cifar_cnn_iid1_extended.pkl', 'wb') as f:
-        pickle.dump([extended_avg_sgd, extended_all_sgd], f)
+        """
+        1. Performance
+        """
+        multiplier = 1
+        with open(f'{plot_directory}/nn_cifar_cnn_.pkl', 'rb') as file:
+            data = pickle.load(file)
+            extended_avg_sgd = expand_data_numpy(data[0], multiplier)
+            extended_all_sgd = [expand_data_numpy(
+                d, multiplier) for d in data[1]]
 
-    title = 'Convergence'
-    file_paths = [
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z0_SZ0_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid1_E10_B50_Z0_S4_A0.6.pkl',
-        f'{plot_directory}/fedavg_cifar_cnn_C0.1_iid1_E10_B50_Z0.pkl',
-        f'{plot_directory}/nn_cifar_cnn_iid1_extended.pkl'
-    ]
-    labels = [
-        'BRAIN',
-        'FedAsync',
-        'FedAvg',
-        'SGD'
-    ]
-    plot_comparison_from_files_with_padding(
-        file_paths, metric_index, labels, title, save_path,
-        # fig_size=(4, 3.5), x_max=400, y_min=0.425, y_max=0.725,
-        fig_size=(4, 3.5), x_max=400,
-        locs=dict(loc='upper center', ncol=2))
+        with open(f'{plot_directory}/nn_cifar_cnn__extended.pkl', 'wb') as f:
+            pickle.dump([extended_avg_sgd, extended_all_sgd], f)
 
-    """
-    2. Byzantine (x5)
-    - BRAIN:    0 / 5 / 10 / 11 / 15
-    - FedAsync: 0 / 5 / 10 / 11 / 15
-    - FedAvg:   0 / 5 / 10 / 11 / 15
-    """
-    for b, th in zip([0, 5, 10, 11, 15], [0.0, 0.125, 0.125, 0.125, 0.125]):
-        title = f'Byzantine_{b}'
+        title = 'Convergence'
         file_paths = [
-            f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_SZ0_D0.55_W4_S4_TH{th}.pkl',
-            f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid1_E10_B50_Z{b}_S4_A0.6.pkl',
-            f'{plot_directory}/fedavg_cifar_cnn_C0.1_iid1_E10_B50_Z{b}.pkl'
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S4_TH0.0.pkl',
+            f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_S4_A0.6.pkl',
+            f'{plot_directory}/fedavg_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0.pkl',
+            f'{plot_directory}/nn_cifar_cnn__extended.pkl'
         ]
         labels = [
             'BRAIN',
             'FedAsync',
-            'FedAvg'
+            'FedAvg',
+            'SGD'
         ]
-        plot_comparison_with_broken_y_axis_and_different_sizes(
+        plot_comparison_from_files_with_padding(
             file_paths, metric_index, labels, title, save_path,
-            fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
-            locs=dict(loc='upper right'), break_point_start=0.225, break_point_end=0.435,
-            top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
+            # fig_size=(4, 3.5), x_max=200, y_min=0.425, y_max=0.725,
+            fig_size=(4, 3.5), x_max=200,
+            locs=dict(loc='lower center', ncol=2))
 
-    """
-    3. Threshold
-    - 0 / 0.100 / 0.120 / 0.125 / 0.130 / 0.200
-    """
-    title = 'Threshold'
-    file_paths = [
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.1.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.12.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.125.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.13.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z10_SZ0_D0.55_W4_S4_TH0.2.pkl'
-    ]
-    labels = [
-        '0.000',
-        '0.100',
-        '0.120',
-        '0.125',
-        '0.130',
-        '0.200'
-    ]
-    plot_comparison_from_files_with_padding(
-        file_paths, metric_index, labels, title, save_path,
-        # fig_size=(4, 3.5), x_max=400, y_min=0.025, y_max=0.725,
-        fig_size=(4, 3.5), x_max=400, y_max=0.8,
-        locs=dict(loc='upper center', ncol=3))
+        """
+        2. Byzantine (x5)
+        - BRAIN:    0 / 5 / 10 / 11 / 15
+        - FedAsync: 0 / 5 / 10 / 11 / 15
+        - FedAvg:   0 / 5 / 10 / 11 / 15
+        """
+        for b, th in zip([0, 5, 10, 11, 15], [0.0, 0.2, 0.2, 0.2, 0.2]):
+            title = f'Byzantine_{b}'
+            file_paths = [
+                f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{b}_SZ0_D0.55_W4_S4_TH{th}.pkl',
+                f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{b}_S4_A0.6.pkl',
+                f'{plot_directory}/fedavg_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{b}.pkl'
+            ]
+            labels = [
+                'BRAIN',
+                'FedAsync',
+                'FedAvg'
+            ]
+            # plot_comparison_with_broken_y_axis_and_different_sizes(
+            plot_comparison_from_files_with_padding(
+                file_paths, metric_index, labels, title, save_path,
+                fig_size=(4, 3.5), x_max=200,
+                # y_min=0.075, y_max=1.0,
+                locs=dict(
+                    loc='lower right',
+                    bbox_to_anchor=(1.0, 0.2)))
+            # break_point_start=0.225, break_point_end=0.735,
+            # top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
 
-    """
-    4. Score Byzantine (x2)
-    - Byzantine 0: 0 / 5 / 10 / 11 / 15
-    - Byzantine 5: 0 / 5 / 10 / 11 / 15
-    """
-    # 0
-    title = f'Score_Byzantine_@_Z{0}'
-    file_paths = [
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ0_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ5_D1.0_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ10_D1.0_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ11_D1.0_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{0}_SZ15_D1.0_W4_S4_TH0.0.pkl'
-    ]
-    labels = [
-        '0',
-        '5',
-        '10',
-        '11',
-        '15'
-    ]
-    plot_comparison_with_broken_y_axis_and_different_sizes(
-        file_paths, metric_index, labels, title, save_path,
-        fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
-        locs=dict(loc='upper right', ncol=2), break_point_start=0.225, break_point_end=0.485,
-        top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
+        """
+        3. Threshold
+        - 0.000 / 0.200 / 0.400 / 0.500 / 0.600 / 0.700
+        """
+        title = 'Threshold'
+        file_paths = [
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.0.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.4.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.5.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.6.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.7.pkl'
+        ]
+        labels = [
+            '0.000',
+            '0.200',
+            '0.400',
+            '0.500',
+            '0.600',
+            '0.700'
+        ]
+        plot_comparison_from_files_with_padding(
+            file_paths, metric_index, labels, title, save_path,
+            # fig_size=(4, 3.5), x_max=200, y_min=0.025, y_max=0.725,
+            fig_size=(4, 3.5), x_max=200,
+            # y_max=0.8,
+            locs=dict(
+                loc='lower right',
+                ncol=2,
+                bbox_to_anchor=(1.0, 0.2)))
 
-    # 5
-    title = f'Score_Byzantine_@_Z{5}'
-    file_paths = [
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ0_D0.55_W4_S4_TH0.125.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ5_D1.0_W4_S4_TH0.145.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ10_D1.0_W4_S4_TH0.145.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ11_D1.0_W4_S4_TH0.145.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z{5}_SZ15_D1.0_W4_S4_TH0.145.pkl'
-    ]
-    labels = [
-        '0',
-        '5',
-        '10',
-        '11',
-        '15'
-    ]
-    # plot_comparison_with_broken_y_axis_and_different_sizes(
-    plot_comparison_from_files_with_padding(
-        file_paths, metric_index, labels, title, save_path,
-        fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
-        locs=dict(loc='lower right', bbox_to_anchor=(1.0, 0.5), ncol=2))
-    # locs=dict(loc='upper right', ncol=2),
-    # break_point_start=0.225, break_point_end=0.485,
-    # top_subplot_size_rati7=5, bottom_subplot_size_ratio=4)
+        """
+        4. Score Byzantine (x2)
+        - Byzantine 0: 0 / 5 / 10 / 11 / 15
+        - Byzantine 5: 0 / 5 / 10 / 11 / 15
+        """
+        # # 0
+        # title = f'Score_Byzantine_@_Z{0}'
+        # file_paths = [
+        #     f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{0}_SZ0_D0.55_W4_S4_TH0.0.pkl',
+        #     f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{0}_SZ5_D1.0_W4_S4_TH0.0.pkl',
+        #     f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{0}_SZ10_D1.0_W4_S4_TH0.0.pkl',
+        #     f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{0}_SZ11_D1.0_W4_S4_TH0.0.pkl',
+        #     f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{0}_SZ15_D1.0_W4_S4_TH0.0.pkl'
+        # ]
+        # labels = [
+        #     '0',
+        #     '5',
+        #     '10',
+        #     '11',
+        #     '15'
+        # ]
+        # plot_comparison_from_files_with_padding(
+        #     # plot_comparison_with_broken_y_axis_and_different_sizes(
+        #     file_paths, metric_index, labels, title, save_path,
+        #     fig_size=(4, 3.5), x_max=200,
+        #     # y_min=0.075, y_max=0.615,
+        #     locs=dict(
+        #         loc='lower right',
+        #         bbox_to_anchor=(1.0, 0.2),
+        #         ncol=2))
+        # # break_point_start=0.225, break_point_end=0.485,
+        # # top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
 
-    """
-    5. Staleness (X2)
-    - FedAsync: 4 / 8 / 16 / 32 / 64
-    - BRAIN: 4 / 8 / 16 / 32 / 64
-    """
-    title = f'Staleness_FedAsync'
-    file_paths = [
-        f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid1_E10_B50_Z0_S4_A0.6.pkl',
-        f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid1_E10_B50_Z0_S8_A0.6.pkl',
-        f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid1_E10_B50_Z0_S16_A0.6.pkl',
-        f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid1_E10_B50_Z0_S32_A0.6.pkl',
-        f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid1_E10_B50_Z0_S64_A0.6.pkl'
-    ]
-    labels = [
-        '4',
-        '8',
-        '16',
-        '32',
-        '64'
-    ]
-    plot_comparison_from_files_with_padding(
-        file_paths, metric_index, labels, title, save_path,
-        fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
-        locs=dict(loc='lower right', ncol=2))
+        # 5
+        title = f'Score_Byzantine_@_Z{5}'
+        file_paths = [
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{5}_SZ0_D0.55_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{5}_SZ5_D1.0_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{5}_SZ10_D1.0_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{5}_SZ11_D1.0_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z{5}_SZ15_D1.0_W4_S4_TH0.2.pkl'
+        ]
+        labels = [
+            '0',
+            '5',
+            '10',
+            '11',
+            '15'
+        ]
+        # plot_comparison_with_broken_y_axis_and_different_sizes(
+        plot_comparison_from_files_with_padding(
+            file_paths, metric_index, labels, title, save_path,
+            fig_size=(4, 3.5), x_max=200,
+            # y_min=0.075, y_max=0.615,
+            locs=dict(
+                loc='lower right',
+                bbox_to_anchor=(1.0, 0.2),
+                ncol=2))
+        # locs=dict(loc='upper right', ncol=2),
+        # break_point_start=0.225, break_point_end=0.485,
+        # top_subplot_size_rati7=5, bottom_subplot_size_ratio=4)
 
-    title = f'Staleness_BRAIN'
-    file_paths = [
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z0_SZ0_D0.55_W4_S4_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z0_SZ0_D0.55_W4_S8_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z0_SZ0_D0.55_W4_S16_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z0_SZ0_D0.55_W4_S32_TH0.0.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z0_SZ0_D0.55_W4_S64_TH0.0.pkl'
-    ]
-    labels = [
-        '4',
-        '8',
-        '16',
-        '32',
-        '64'
-    ]
-    plot_comparison_from_files_with_padding(
-        file_paths, metric_index, labels, title, save_path,
-        fig_size=(4, 3.5), x_max=400, y_min=0.075, y_max=0.615,
-        locs=dict(loc='lower right', ncol=2))
+        """
+        5. Staleness (X2)
+        - FedAsync: 4 / 8 / 16 / 32 / 64
+        - BRAIN: 4 / 8 / 16 / 32 / 64
+        """
+        title = f'Staleness_FedAsync'
+        file_paths = [
+            f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_S4_A0.6.pkl',
+            f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_S8_A0.6.pkl',
+            f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_S16_A0.6.pkl',
+            f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_S32_A0.6.pkl',
+            # f'{plot_directory}/fedasync_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_S64_A0.6.pkl'
+        ]
+        labels = [
+            '4',
+            '8',
+            '16',
+            '32',
+            # '64'
+        ]
+        plot_comparison_from_files_with_padding(
+            file_paths, metric_index, labels, title, save_path,
+            fig_size=(4, 3.5), x_max=200,
+            # y_min=0.075, y_max=0.615,
+            locs=dict(loc='lower right', ncol=2))
 
-    """
-    6. Quorum
-    - Byzantine: 5
-    - Score Byzantine: 10
-    - Diff (Quorum): 0.25 (5) / [0.50 (10)] 0.55 (11) / 0.75 (15) / [0.99 (20)] 1.0 (21)
-    """
-    title = f'Quorum'
-    file_paths = [
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.25_W4_S4_TH0.145.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.55_W4_S4_TH0.145.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D0.75_W4_S4_TH0.145.pkl',
-        f'{plot_directory}/brain_cifar_cnn_C0.1_iid1_E10_B50_Z5_SZ10_D1.0_W4_S4_TH0.145.pkl'
-    ]
-    labels = [
-        '5',
-        '11',
-        '15',
-        '21'
-    ]
-    plot_comparison_from_files_with_padding(
-        file_paths, metric_index, labels, title, save_path,
-        fig_size=(4, 3.5), x_max=400, y_max=0.8,
-        locs=dict(loc='upper center', ncol=2))
+        title = f'Staleness_BRAIN'
+        file_paths = [
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S4_TH0.0.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S8_TH0.0.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S16_TH0.0.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S32_TH0.0.pkl',
+            # f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S64_TH0.0.pkl'
+        ]
+        labels = [
+            '4',
+            '8',
+            '16',
+            '32',
+            # '64'
+        ]
+        plot_comparison_from_files_with_padding(
+            file_paths, metric_index, labels, title, save_path,
+            fig_size=(4, 3.5), x_max=200,
+            # y_min=0.075, y_max=0.615,
+            locs=dict(loc='lower right', ncol=2))
+
+        """
+        6. Quorum
+        - Byzantine: 5
+        - Score Byzantine: 10
+        - Diff (Quorum): 0.25 (5) / [0.50 (10)] 0.55 (11) / 0.75 (15) / [0.99 (20)] 1.0 (21)
+        """
+        title = f'Quorum'
+        file_paths = [
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D0.25_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D0.55_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D0.75_W4_S4_TH0.2.pkl',
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D1.0_W4_S4_TH0.2.pkl'
+        ]
+        labels = [
+            '5',
+            '11',
+            '15',
+            '21'
+        ]
+        plot_comparison_from_files_with_padding(
+            file_paths, metric_index, labels, title, save_path,
+            fig_size=(4, 3.5), x_max=200,
+            # y_max=0.8,
+            locs=dict(loc='upper center', ncol=2))

@@ -2,11 +2,18 @@
 # -*- coding: utf-8 -*-
 # Python version: 3.6
 
+import time
 import copy
+from math import ceil
+
 import torch
 from torchvision import datasets, transforms
 from sampling import mnist_iid, mnist_noniid, mnist_noniid_unequal
 from sampling import cifar_iid, cifar_noniid
+
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def get_dataset(args):
@@ -15,8 +22,62 @@ def get_dataset(args):
     each of those users.
     """
 
+    def print_label_distribution(user_data, dataset):
+        num_labels = 10  # CIFAR10 has 10 classes
+        label_names = dataset.classes
+
+        # For each user
+        for user, indices in user_data.items():
+            # Initialize a count dictionary for labels
+            label_counts = {label: 0 for label in label_names}
+
+            # Count labels
+            for idx in indices:
+                label = dataset.targets[idx]
+                label_counts[label_names[label]] += 1
+
+            # Print distribution for the user
+            print(f'User {user} Label Distribution:')
+            for label, count in label_counts.items():
+                print(f'{label}: {count}')
+            print('')  # Print a newline for better separation
+
+    def plot_label_distribution(user_data, dataset):
+        num_labels = 10  # CIFAR10 has 10 classes
+        num_users = len(user_data)
+        label_names = dataset.classes
+        user_names = [rf'${i}$' for i in range(num_users)]
+
+        # Initialize the matrix to hold label counts for each user
+        label_counts_matrix = np.zeros((num_labels, num_users), dtype=int)
+
+        for user, indices in user_data.items():
+            for idx in indices:
+                label = dataset.targets[idx]
+                label_counts_matrix[label, user] += 1
+
+        # Create the heatmap
+        vmax = ceil(float(np.max(label_counts_matrix))/100)*100
+        plt.figure(figsize=(10.5, 4.5))
+        ax = sns.heatmap(label_counts_matrix, annot=True, fmt="d",
+                         cmap="Greys",
+                         vmin=0, vmax=vmax,
+                         xticklabels=user_names, yticklabels=label_names)
+
+        # ax.set_title('Label Distribution Across Users')
+        # ax.set_xlabel('Node')
+        # ax.set_ylabel('Label')
+        plt.yticks(rotation=45)
+
+        cbar = ax.collections[0].colorbar
+        cbar.outline.set_linewidth(1)
+
+        plt.tight_layout()
+        plt.savefig(
+            f'./save/distribution_{args.dataset}_iid{args.iid}_{int(time.time())}.png', bbox_inches='tight', dpi=300)
+
     if args.dataset == 'cifar':
-        data_dir = './data/cifar/'
+        data_dir = './data/cifar10'
         apply_transform = transforms.Compose(
             [transforms.ToTensor(),
              transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
@@ -29,46 +90,16 @@ def get_dataset(args):
 
         # sample training data amongst users
         if args.iid:
-            # Sample IID user data from Mnist
             user_groups = cifar_iid(train_dataset, args.num_users)
         else:
-            # Sample Non-IID user data from Mnist
-            if args.unequal:
-                # Chose uneuqal splits for every user
-                raise NotImplementedError()
-            else:
-                # Chose euqal splits for every user
-                user_groups = cifar_noniid(train_dataset, args.num_users)
+            user_groups = cifar_noniid(
+                train_dataset, args.num_users, alpha=3.0)
+    else:
+        raise NotImplementedError()
 
-    elif args.dataset == 'mnist' or 'fmnist':
-        if args.dataset == 'mnist':
-            data_dir = './data/mnist/'
-        else:
-            data_dir = './data/fmnist/'
-
-        apply_transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.1307,), (0.3081,))])
-
-        train_dataset = datasets.MNIST(data_dir, train=True, download=True,
-                                       transform=apply_transform)
-
-        test_dataset = datasets.MNIST(data_dir, train=False, download=True,
-                                      transform=apply_transform)
-
-        # sample training data amongst users
-        if args.iid:
-            # Sample IID user data from Mnist
-            user_groups = mnist_iid(train_dataset, args.num_users)
-        else:
-            # Sample Non-IID user data from Mnist
-            if args.unequal:
-                # Chose uneuqal splits for every user
-                user_groups = mnist_noniid_unequal(
-                    train_dataset, args.num_users)
-            else:
-                # Chose euqal splits for every user
-                user_groups = mnist_noniid(train_dataset, args.num_users)
+    # Visualization
+    print([len(user_groups[k]) for k in user_groups.keys()])
+    plot_label_distribution(user_groups, train_dataset)
 
     return train_dataset, test_dataset, user_groups
 

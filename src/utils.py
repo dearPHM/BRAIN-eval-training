@@ -90,15 +90,16 @@ def get_dataset(args):
 
         # sample training data amongst users
         if args.iid:
-            user_groups = cifar_iid(train_dataset, args.num_users)
+            user_groups = cifar_iid(
+                train_dataset, args.num_users - (args.byzantines if args.byzantines < args.score_byzantines else args.score_byzantines))
         else:
             user_groups = cifar_noniid(
-                train_dataset, args.num_users, alpha=3.0)
+                train_dataset, args.num_users - (args.byzantines if args.byzantines < args.score_byzantines else args.score_byzantines), alpha=3.0)
     else:
         raise NotImplementedError()
 
     # Visualization
-    print([len(user_groups[k]) for k in user_groups.keys()])
+    # print([len(user_groups[k]) for k in user_groups.keys()])
     plot_label_distribution(user_groups, train_dataset)
 
     return train_dataset, test_dataset, user_groups
@@ -129,8 +130,7 @@ def compose_weight(w0, w1, a=0.6):
 def exp_details(args):
     print('\nExperimental details:')
     print(f'    Model     : {args.model}')
-    print(f'    Optimizer : {args.optimizer}')
-    print(f'    Learning  : {args.lr}')
+    print(f'    Dataset   : {args.dataset}/{args.num_classes}')
     print(f'    Global Rounds   : {args.epochs}\n')
 
     print('    Federated parameters:')
@@ -138,6 +138,7 @@ def exp_details(args):
         print('    IID')
     else:
         print('    Non-IID')
+    print(f'    Number of users    : {args.num_users}')
     print(f'    Fraction of users  : {args.frac}')
     print(f'    Local Batch size   : {args.local_bs}')
     print(f'    Local Epochs       : {args.local_ep}\n')

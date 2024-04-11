@@ -12,16 +12,17 @@ import statistics
 import csv
 from tqdm import tqdm
 
-import torch
 from tensorboardX import SummaryWriter
 
 from options import args_parser
 from update import LocalUpdate, ByzantineLocalUpdate, test_inference
-from models import MLP, CNNMnist, CNNFashion_Mnist, CNNCifar
 from utils import get_dataset, compose_weight, exp_details
 
 from cache import ItemCache
 from moving_average import MovingAverage
+
+from airbench.model import make_net
+from airbench.hyperparameters import hyp
 
 
 if __name__ == '__main__':
@@ -35,37 +36,25 @@ if __name__ == '__main__':
     args = args_parser()
     exp_details(args)
 
-    device = torch.device('cuda' if (
-        args.gpu != None and torch.cuda.is_available()) else 'cpu')
-    if device.type == 'cuda':
-        torch.cuda.set_device(args.gpu)
+    num_byzantines = (args.byzantines if args.byzantines <
+                      args.score_byzantines else args.score_byzantines)
 
     # load dataset and user groups
+    # TODO: Is that comparable between Byzantine and non-iid nodes?
+    os.makedirs('./save', exist_ok=True)
+    os.makedirs('./save/objects', exist_ok=True)
     train_dataset, test_dataset, user_groups = get_dataset(args)
 
     # BUILD MODEL
-    if args.model == 'cnn':
-        # Convolutional neural netork
-        if args.dataset == 'mnist':
-            global_model = CNNMnist(args=args)
-        elif args.dataset == 'fmnist':
-            global_model = CNNFashion_Mnist(args=args)
-        elif args.dataset == 'cifar':
-            global_model = CNNCifar(args=args)
-
-    elif args.model == 'mlp':
-        # Multi-layer preceptron
-        img_size = train_dataset[0][0].shape
-        len_in = 1
-        for x in img_size:
-            len_in *= x
-            global_model = MLP(dim_in=len_in, dim_hidden=64,
-                               dim_out=args.num_classes)
+    if (args.model == 'cnn') and (args.dataset == 'cifar'):
+        pass
     else:
         exit('Error: unrecognized model')
-
-    # Set the model to train and send it to device.
-    global_model = global_model.to(device)
+    # Make Model
+    widths = hyp['net']['widths']
+    batchnorm_momentum = hyp['net']['batchnorm_momentum']
+    scaling_factor = hyp['net']['scaling_factor']
+    global_model = make_net(widths, batchnorm_momentum, scaling_factor)
     global_model.train()
     print(global_model)
 
@@ -101,15 +90,18 @@ if __name__ == '__main__':
 
             for idx in idxs_users:
                 if idx >= args.byzantines:
-                    local_model = LocalUpdate(args=args, dataset=train_dataset,
-                                              idxs=user_groups[idx], logger=logger)
+                    local_model = LocalUpdate(args=args, hyps=hyp,
+                                              dataset=train_dataset, idxs=user_groups[idx -
+                                                                                      num_byzantines],
+                                              logger=logger)
                     traning_start = time.time()
                 else:
-                    local_model = ByzantineLocalUpdate(args=args, dataset=train_dataset,
-                                                       idxs=user_groups[idx], logger=logger)
+                    local_model = ByzantineLocalUpdate(args=args, hyps=None,
+                                                       dataset=train_dataset, idxs=[],
+                                                       logger=logger)
 
                 w, loss = local_model.update_weights(
-                    model=copy.deepcopy(global_model), global_round=epoch)
+                    model=copy.deepcopy(global_model), epochs=args.local_ep, global_round=epoch)
                 if idx >= args.byzantines:
                     traning_times.append(time.time() - traning_start)
 
@@ -133,8 +125,10 @@ if __name__ == '__main__':
                 for idx in committee:
                     # BRAIN: `score_byzantines` submit random score
                     if idx >= args.score_byzantines:
-                        local_model = LocalUpdate(args=args, dataset=train_dataset,
-                                                  idxs=user_groups[idx], logger=logger)
+                        local_model = LocalUpdate(args=args, hyps=hyp,
+                                                  dataset=train_dataset, idxs=user_groups[idx -
+                                                                                          num_byzantines],
+                                                  logger=logger)
                         temp_model = copy.deepcopy(global_model)
                         temp_model.load_state_dict(local_weight)
                         temp_model.eval()
@@ -162,27 +156,6 @@ if __name__ == '__main__':
                         global_weights, local_weight, alpha)
                     global_model.load_state_dict(global_weights)
 
-        # # Calculate avg training accuracy over all users at every epoch
-        # list_acc, list_loss = [], []
-        # global_model.eval()
-
-        # for idx in idxs_users:
-        #     local_model = LocalUpdate(args=args, dataset=train_dataset,
-        #                               idxs=user_groups[idx], logger=logger)
-        #     acc, loss = local_model.inference(model=global_model)
-        #     # if idx >= args.byzantines:
-        #     list_acc.append(acc)
-        #     list_loss.append(loss)
-        # test_acc_collect.append(sum(list_acc)/len(list_acc))
-        # test_loss_collect.append(sum(list_loss)/len(list_loss))
-
-        # # print global training loss after every 'i' rounds
-        # if (epoch+1) % print_every == 0:
-        #     print(f' \nAvg Training Stats after {epoch+1} global rounds:')
-        #     print(f'Training Loss : {np.mean(np.array(test_loss_collect))}')
-        #     print('Train Accuracy: {:.2f}% \n'.format(
-        #         100*test_acc_collect[-1]))
-
         # Test inference after completion of training
         test_acc, test_loss = test_inference(args, global_model, test_dataset)
         test_acc_collect.append(test_acc)
@@ -204,6 +177,7 @@ if __name__ == '__main__':
     print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
     print(f'\n Avg Training Time: {np.median(np.array(traning_times))}')
     file_path = './results/times.csv'
+    os.makedirs('./results', exist_ok=True)
     with open(file_path, 'a', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(traning_times)

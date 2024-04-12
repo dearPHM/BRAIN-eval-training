@@ -11,7 +11,8 @@ import itertools
 
 def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, title, save_path,
                                             fig_size=(4, 4), x_max=None, x_mul=20, y_min=0, y_max=None,
-                                            locs=dict(loc='upper right')):
+                                            locs=dict(loc='upper right'),
+                                            highlight=False):
     # plt.figure(figsize=(10, 6))
     plt.figure(figsize=fig_size)
     sns.set_theme(style="ticks")
@@ -80,12 +81,12 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
             {'Epoch': x_axis, 'Value': padded_avg_data, 'Group': label})
         sns.lineplot(x='Epoch', y='Value', data=df, style='Group', zorder=2,
                      dashes=False,
-                     linewidth=0.75, color=marker_color)
+                     linewidth=0.75, alpha=1.0 if i == 0 or not highlight else 0.6, color=marker_color)
         #  markers=marker, markersize=4, markeredgewidth=0.5)
 
         # Overlay scatterplot at a reduced frequency for markers
         # Sampling for marker density
-        sampled_df = df.iloc[[(110+(i)*45) % x_max]]
+        sampled_df = df.iloc[[(10+(i)*45) % x_max]]
         sns.scatterplot(x='Epoch', y='Value', data=sampled_df, zorder=3,
                         marker=marker, color=marker_color, s=50, edgecolor='black',
                         legend=False)
@@ -131,7 +132,8 @@ def plot_comparison_from_files_with_padding(file_paths, metric_index, labels, ti
 def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_index, labels, title, save_path,
                                                            fig_size=(4, 4), x_max=None, x_mul=20, y_min=0, y_max=None,
                                                            locs=dict(loc='upper right'), break_point_start=None, break_point_end=None,
-                                                           top_subplot_size_ratio=2, bottom_subplot_size_ratio=1):
+                                                           top_subplot_size_ratio=2, bottom_subplot_size_ratio=1,
+                                                           highlight=False):
     # Initialize the figure
     plt.figure(figsize=fig_size)
     # sns.set_theme(style="ticks")
@@ -218,7 +220,7 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
 
         sns.lineplot(x='Epoch', y='Value', data=df, style='Group', zorder=2,
                      dashes=False,
-                     linewidth=0.75, color=marker_color, ax=ax1, legend=False)
+                     linewidth=0.75, alpha=1.0 if i == 0 or not highlight else 0.6, color=marker_color, ax=ax1, legend=False)
         #  markers=marker, markersize=4, markeredgewidth=0.5)
         # Overlay scatterplot at a reduced frequency for markers
         # Sampling for marker density
@@ -229,7 +231,7 @@ def plot_comparison_with_broken_y_axis_and_different_sizes(file_paths, metric_in
 
         sns.lineplot(x='Epoch', y='Value', data=df, style='Group', zorder=2,
                      dashes=False,
-                     linewidth=0.75, color=marker_color, ax=ax2)
+                     linewidth=0.75, alpha=1.0 if i == 0 or not highlight else 0.6, color=marker_color, ax=ax2)
         #  markers=marker, markersize=4, markeredgewidth=0.5)
         # Overlay scatterplot at a reduced frequency for markers
         # Sampling for marker density
@@ -346,7 +348,8 @@ if __name__ == '__main__':
             file_paths, metric_index, labels, title, save_path,
             # fig_size=(4, 3.5), x_max=200, y_min=0.425, y_max=0.725,
             fig_size=(4, 3.5), x_max=200,
-            locs=dict(loc='lower center', ncol=2))
+            locs=dict(loc='lower center', ncol=2),
+            highlight=True)
 
         """
         2. Byzantine (x5)
@@ -373,7 +376,8 @@ if __name__ == '__main__':
                 # y_min=0.075, y_max=1.0,
                 locs=dict(
                     loc='lower right',
-                    bbox_to_anchor=(1.0, 0.2)))
+                    bbox_to_anchor=(1.0, 0.2)),
+                highlight=True)
             # break_point_start=0.225, break_point_end=0.735,
             # top_subplot_size_ratio=7, bottom_subplot_size_ratio=4)
 
@@ -464,7 +468,7 @@ if __name__ == '__main__':
             # y_min=0.075, y_max=0.615,
             locs=dict(
                 loc='lower right',
-                bbox_to_anchor=(1.0, 0.2),
+                bbox_to_anchor=(1.0, 0.4),
                 ncol=2))
         # locs=dict(loc='upper right', ncol=2),
         # break_point_start=0.225, break_point_end=0.485,
@@ -540,4 +544,7 @@ if __name__ == '__main__':
             file_paths, metric_index, labels, title, save_path,
             fig_size=(4, 3.5), x_max=200,
             # y_max=0.8,
-            locs=dict(loc='upper center', ncol=2))
+            locs=dict(
+                loc='lower right',
+                bbox_to_anchor=(1.0, 0.4),
+                ncol=2))

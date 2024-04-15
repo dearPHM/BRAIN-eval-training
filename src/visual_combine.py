@@ -533,7 +533,8 @@ if __name__ == '__main__':
         - Score Byzantine: 10
         - Diff (Quorum): 0.25 (5) / [0.50 (10)] 0.55 (11) / 0.75 (15) / [0.99 (20)] 1.0 (21)
         """
-        title = f'Quorum'
+        # TH 0.2
+        title = f'Quorum_TH0.2'
         file_paths = [
             f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D0.25_W4_S4_TH0.2.pkl',
             f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D0.55_W4_S4_TH0.2.pkl',
@@ -555,3 +556,28 @@ if __name__ == '__main__':
                 loc='lower right',
                 bbox_to_anchor=(1.0, 0.4),
                 ncol=2))
+
+        # TH 0.4
+        if iid == 0:
+            title = f'Quorum_TH0.4'
+            file_paths = [
+                f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D0.25_W4_S4_TH0.4.pkl',
+                f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D0.55_W4_S4_TH0.4.pkl',
+                f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D0.75_W4_S4_TH0.4.pkl',
+                f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z5_SZ10_D1.0_W4_S4_TH0.4.pkl'
+            ]
+            labels = [
+                '5',
+                '11',
+                '15',
+                '21'
+            ]
+            print(file_paths)
+            plot_comparison_from_files_with_padding(
+                file_paths, metric_index, labels, title, save_path,
+                fig_size=(4, 3.5), x_max=200,
+                # y_max=0.8,
+                locs=dict(
+                    loc='lower right',
+                    bbox_to_anchor=(1.0, 0.4),
+                    ncol=2))

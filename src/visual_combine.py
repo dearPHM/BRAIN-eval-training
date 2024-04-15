@@ -344,6 +344,7 @@ if __name__ == '__main__':
             'FedAvg',
             'SGD'
         ]
+        print(file_paths)
         plot_comparison_from_files_with_padding(
             file_paths, metric_index, labels, title, save_path,
             # fig_size=(4, 3.5), x_max=200, y_min=0.425, y_max=0.725,
@@ -370,6 +371,7 @@ if __name__ == '__main__':
                 'FedAvg'
             ]
             # plot_comparison_with_broken_y_axis_and_different_sizes(
+            print(file_paths)
             plot_comparison_from_files_with_padding(
                 file_paths, metric_index, labels, title, save_path,
                 fig_size=(4, 3.5), x_max=200,
@@ -402,6 +404,7 @@ if __name__ == '__main__':
             '0.500',
             '0.600'
         ]
+        print(file_paths)
         plot_comparison_from_files_with_padding(
             file_paths, metric_index, labels, title, save_path,
             # fig_size=(4, 3.5), x_max=200, y_min=0.025, y_max=0.725,
@@ -410,7 +413,7 @@ if __name__ == '__main__':
             locs=dict(
                 loc='lower right',
                 ncol=2,
-                bbox_to_anchor=(1.0, 0.2)))
+                bbox_to_anchor=(1.0, 0.3)))
 
         """
         4. Score Byzantine (x2)
@@ -461,6 +464,7 @@ if __name__ == '__main__':
             '11',
             '15'
         ]
+        print(file_paths)
         # plot_comparison_with_broken_y_axis_and_different_sizes(
         plot_comparison_from_files_with_padding(
             file_paths, metric_index, labels, title, save_path,
@@ -494,6 +498,7 @@ if __name__ == '__main__':
             '32',
             # '64'
         ]
+        print(file_paths)
         plot_comparison_from_files_with_padding(
             file_paths, metric_index, labels, title, save_path,
             fig_size=(4, 3.5), x_max=200,
@@ -515,6 +520,7 @@ if __name__ == '__main__':
             '32',
             # '64'
         ]
+        print(file_paths)
         plot_comparison_from_files_with_padding(
             file_paths, metric_index, labels, title, save_path,
             fig_size=(4, 3.5), x_max=200,
@@ -540,6 +546,7 @@ if __name__ == '__main__':
             '15',
             '21'
         ]
+        print(file_paths)
         plot_comparison_from_files_with_padding(
             file_paths, metric_index, labels, title, save_path,
             fig_size=(4, 3.5), x_max=200,

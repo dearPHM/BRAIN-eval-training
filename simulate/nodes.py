@@ -59,7 +59,7 @@ def argparser():
                         help='Quorum of Commitments')
     # parser.add_argument('--qr', metavar='QR', type=int, default=11,
     # help='Quorum of Revelations')
-    parser.add_argument('--qto', metavar='O', type=int, default=20,
+    parser.add_argument('--qto', metavar='O', type=int, default=20,  # TODO
                         help='Training Request\'s Timeout [blocks] \ 0 for infinity')
     # parser.add_argument('--tr', metavar='TR', type=int, default=30,
     # help='Period of the Reveal Phase [blocks]')

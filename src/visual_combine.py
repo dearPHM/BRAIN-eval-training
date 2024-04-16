@@ -581,3 +581,34 @@ if __name__ == '__main__':
                     loc='lower right',
                     bbox_to_anchor=(1.0, 0.4),
                     ncol=2))
+
+        """
+        7. Fast Bootstrapping
+        """
+        title = 'Drift'
+        file_paths = [
+            f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S4_TH0.0.pkl',
+            f'{plot_directory}/drift_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S4_TH0.0_DR5.pkl',
+            f'{plot_directory}/drift_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S4_TH0.0_DR11.pkl',
+            f'{plot_directory}/drift_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S4_TH0.0_DR15.pkl',
+            f'{plot_directory}/drift_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z0_SZ0_D0.55_W4_S4_TH0.0_DR21.pkl'
+        ]
+        labels = [
+            # 'BRAIN',
+            # 'Fast (5)'
+            # 'Fast (11)'
+            # 'Fast (15)'
+            # 'Fast (21)'
+            0,
+            5,
+            11,
+            15,
+            21
+        ]
+        print(file_paths)
+        plot_comparison_from_files_with_padding(
+            file_paths, metric_index, labels, title, save_path,
+            # fig_size=(4, 3.5), x_max=200, y_min=0.425, y_max=0.725,
+            fig_size=(4, 3.5), x_max=200,
+            locs=dict(loc='lower center', ncol=2),
+            highlight=True)

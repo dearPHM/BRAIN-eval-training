@@ -40,7 +40,6 @@ if __name__ == '__main__':
                       args.score_byzantines else args.score_byzantines)
 
     # load dataset and user groups
-    # TODO: Is that comparable between Byzantine and non-iid nodes?
     os.makedirs('./save', exist_ok=True)
     os.makedirs('./save/objects', exist_ok=True)
     train_dataset, test_dataset, user_groups = get_dataset(args)

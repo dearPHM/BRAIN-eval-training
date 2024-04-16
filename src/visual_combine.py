@@ -385,7 +385,7 @@ if __name__ == '__main__':
 
         """
         3. Threshold
-        - 0.000 / 0.200 / 0.300 / 0.400 / 0.500 / 0.600
+        - 0.0 / 0.2 / 0.3 / 0.4 / 0.5 / 0.6
         """
         title = 'Threshold'
         file_paths = [
@@ -397,12 +397,12 @@ if __name__ == '__main__':
             f'{plot_directory}/brain_cifar_cnn_C0.1_iid{iid}_E9.9_B1024_Z10_SZ0_D0.55_W4_S4_TH0.6.pkl'
         ]
         labels = [
-            '0.000',
-            '0.200',
-            '0.300',
-            '0.400',
-            '0.500',
-            '0.600'
+            '0.0',
+            '0.2',
+            '0.3',
+            '0.4',
+            '0.5',
+            '0.6'
         ]
         print(file_paths)
         plot_comparison_from_files_with_padding(

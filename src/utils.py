@@ -117,6 +117,19 @@ def average_weights(w):
     return w_avg
 
 
+def weighted_average_weights(w, a):
+    """
+    Returns the weighted average of the weights.
+    """
+    denom = sum(a)
+    w_avg = copy.deepcopy(w[0]) * a[0]
+    for key in w_avg.keys():
+        for i in range(1, len(w)):
+            w_avg[key] += w[i][key] * a[i]
+        w_avg[key] = torch.div(w_avg[key], denom)
+    return w_avg
+
+
 def compose_weight(w0, w1, a=0.6):
     """
     Returns the average of the weights.

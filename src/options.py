@@ -32,7 +32,8 @@ def args_parser():
                         help='accuracy threshold to ignore (default: 0.125)')
     parser.add_argument('--score_byzantines', type=int, default=0,
                         help="number of Byzantine users who submit random score: SZ")
-
+    parser.add_argument('--drift', type=int, default=0,
+                        help="number of users who are drifted from global model")
     # model arguments
     parser.add_argument('--model', type=str, default='cnn', help='model name')
     # parser.add_argument('--norm', type=str, default='batch_norm',

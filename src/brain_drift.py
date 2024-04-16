@@ -173,7 +173,7 @@ if __name__ == '__main__':
                     global_model.load_state_dict(global_weights)
 
         # drift
-        if args.drift != 0:
+        if args.drift != 0 and len(local_models) != 0:
             local_models.extend(local_weights)
             scores.extend(local_eval_med_accs)
             drifted_model = weighted_average_weights(

@@ -32,12 +32,12 @@ mid_point = interpolated_points[len(interpolated_points)//2]
 plt.quiver(0, 0, mid_point[0], mid_point[1], angles='xy',
            scale_units='xy', scale=1, color=palette[1], alpha=1.0, width=0.01)
 plt.text(mid_point[0]*0.98, mid_point[1]*1.1,
-         r'$\overline{M_r}$', fontsize=24)
+         r'$\overline{M_{r-1}}$', fontsize=24)
 
 # Adding labels beside red and blue arrows
 plt.text(x[0]*0.98, x[1]*1.05,
-         r'$\overline{M_{r-1}}$', fontsize=24)
-plt.text(y[0]*0.88, y[1]*1.25, '$M_r$', fontsize=24)
+         r'$\overline{M_{r-2}}$', fontsize=24)
+plt.text(y[0]*0.88, y[1]*1.25, r'$M_{r-1}$', fontsize=24)
 
 # Drawing angle arc for \theta
 arc_radius = 5

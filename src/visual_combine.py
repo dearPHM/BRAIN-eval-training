@@ -610,5 +610,5 @@ if __name__ == '__main__':
             file_paths, metric_index, labels, title, save_path,
             # fig_size=(4, 3.5), x_max=200, y_min=0.425, y_max=0.725,
             fig_size=(4, 3.5), x_max=200,
-            locs=dict(loc='lower center', ncol=2),
+            locs=dict(loc='lower center', ncol=3),
             highlight=True)

@@ -114,9 +114,11 @@ if __name__ == "__main__":
             # Directly map gids to their index in gids list for central alignment
             layer_map[node] = gids.index(node)
         else:
+            # Assign other nodes to a layer based on the highest layer of their predecessors
             # Assign other nodes to a layer based on the highest layer of their predecessors + 1
             preds = list(G.predecessors(node))
             if preds:
+                # layer_map[node] = max(layer_map[pred] for pred in preds)
                 layer_map[node] = max(layer_map[pred] for pred in preds) + 1
             else:
                 layer_map[node] = 0

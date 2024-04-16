@@ -122,8 +122,9 @@ def weighted_average_weights(w, a):
     Returns the weighted average of the weights.
     """
     denom = sum(a)
-    w_avg = copy.deepcopy(w[0]) * a[0]
+    w_avg = copy.deepcopy(w[0])
     for key in w_avg.keys():
+        w_avg[key] = torch.mul(w_avg[key], a[0])
         for i in range(1, len(w)):
             w_avg[key] += w[i][key] * a[i]
         w_avg[key] = torch.div(w_avg[key], denom)

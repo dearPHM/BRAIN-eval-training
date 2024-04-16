@@ -76,7 +76,10 @@ if __name__ == '__main__':
     wma = MovingAverage(args.window)
 
     # drift
-    drifted_model = copy.deepcopy(global_model)
+    drifted_model = make_net(widths, batchnorm_momentum, scaling_factor)
+    drifted_model.load_state_dict(global_weights)
+    drifted_model.train()
+
     local_models = []
     scores = []
 
@@ -89,6 +92,8 @@ if __name__ == '__main__':
 
         if (epoch < args.epochs):
             global_model.train()
+            drifted_model.train()
+
             m = max(int(args.frac * args.num_users), 1)
             idxs_users = np.random.choice(
                 range(args.num_users), m, replace=False)
@@ -173,11 +178,18 @@ if __name__ == '__main__':
                     global_model.load_state_dict(global_weights)
 
         # drift
-        if args.drift != 0 and len(local_models) != 0:
-            local_models.extend(local_weights)
-            scores.extend(local_eval_med_accs)
-            drifted_model = weighted_average_weights(
-                local_models[:-1 * args.window], scores[:-1 * args.window])
+        if len(local_weights) != 0:
+            for local_weight, score in zip(local_weights, local_eval_med_accs):
+                if score is None:
+                    pass
+                else:
+                    local_models.append(local_weight)
+                    scores.append(score)
+
+        if len(local_models) != 0:
+            drifted_weights = weighted_average_weights(
+                local_models[-1 * args.window:], scores[-1 * args.window:])
+            drifted_model.load_state_dict(drifted_weights)
 
         # Test inference after completion of training
         test_acc, test_loss = test_inference(args, global_model, test_dataset)

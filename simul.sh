@@ -2,12 +2,11 @@ mkdir simul
 
 # SIMULATION
 RES_PATH="./simul"
-REPEAT=1 # TODO
+REPEAT=100
 # CHAIN=("ETHEREUM" "POLYGON")
 CHAIN=("ETHEREUM")
 
-# TODO
-TIMES=1.0
+TIMES=86400.0
 AMOUNTS=1000
 
 # Default values
@@ -34,19 +33,20 @@ for C in ${CHAIN[@]}; do
                  python simulate/nodes.py --verbose 0 --repeat ${REPEAT} --qc ${QC} --size ${SIZE} --interval ${INTERVAL} --d ${D} --times ${TIMES} --amounts ${AMOUNTS} > ${RES_PATH}/${C}_D_${D}_QC_${QC}.txt
         done
 
-        # TIMEOUT
-        TIMEOUT=(10 15 20 25)
-        for QTO in ${TIMEOUT[@]}; do
-            echo python simulate/nodes.py --verbose 0 --repeat ${REPEAT} --qto ${QTO} --size ${SIZE} --interval ${INTERVAL} --d ${D} --times ${TIMES} --amounts ${AMOUNTS}
-                 python simulate/nodes.py --verbose 0 --repeat ${REPEAT} --qto ${QTO} --size ${SIZE} --interval ${INTERVAL} --d ${D} --times ${TIMES} --amounts ${AMOUNTS} > ${RES_PATH}/${C}_D_${D}_QTO_${QTO}.txt
-        done
+        # # TIMEOUT
+        # TIMEOUT=(10 15 20 25)
+        # for QTO in ${TIMEOUT[@]}; do
+        #     echo python simulate/nodes.py --verbose 0 --repeat ${REPEAT} --qto ${QTO} --size ${SIZE} --interval ${INTERVAL} --d ${D} --times ${TIMES} --amounts ${AMOUNTS}
+        #          python simulate/nodes.py --verbose 0 --repeat ${REPEAT} --qto ${QTO} --size ${SIZE} --interval ${INTERVAL} --d ${D} --times ${TIMES} --amounts ${AMOUNTS} > ${RES_PATH}/${C}_D_${D}_QTO_${QTO}.txt
+        # done
     done
 
     # BYZANTINE test
     BYZANTINE=(0 5 10 11 15)  # 5 10 15 21
     for B in ${BYZANTINE[@]}; do
         # QUORUM
-        QUORUM=(5 10 11 15 20)
+        # QUORUM=(5 10 11 15 20)
+        QUORUM=(5 10 11 15)
         for QC in ${QUORUM[@]}; do
             echo python simulate/nodes.py --verbose 0 --repeat ${REPEAT} --byz ${B} --qc ${QC} --size ${SIZE} --interval ${INTERVAL} --times ${TIMES} --amounts ${AMOUNTS}
                  python simulate/nodes.py --verbose 0 --repeat ${REPEAT} --byz ${B} --qc ${QC} --size ${SIZE} --interval ${INTERVAL} --times ${TIMES} --amounts ${AMOUNTS} > ${RES_PATH}/${C}_B_${B}_QC_${QC}.txt

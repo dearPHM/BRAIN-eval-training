@@ -5,9 +5,8 @@ RES_PATH="./simul_heatmap"
 REPEAT=100
 # CHAIN=("ETHEREUM" "POLYGON")
 CHAIN=("ETHEREUM")
-QTO=0  # 0 for infinity
+QTO=7881  # 0 for infinity
 
-# TODO
 TIMES=86400.0
 AMOUNTS=1000
 
@@ -31,5 +30,5 @@ for C in ${CHAIN[@]}; do
 done
 
 
-# # Visualization
-# python visualization/heatmap.py
+# Visualization
+python visualization/heatmap.py

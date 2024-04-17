@@ -242,7 +242,7 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
                         # left, bottom, width, height
                         cax=fig.add_axes([0.904, 0.114, 0.012, 0.767]),
                         orientation='vertical')
-    cbar.set_label('Stale', labelpad=-52)
+    cbar.set_label('Staleness', labelpad=-52)
     # cbar.set_label('Latency (x7164)', labelpad=-48.5)
     if aux_index != None:
         sm = plt.cm.ScalarMappable(

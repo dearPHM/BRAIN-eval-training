@@ -28,7 +28,11 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
 
     # TODO: highlight_scale_factor
     main_scaled_factor = 0.1 * 1  # (index) +/- scaling target  # +/- 10%
-    aux_th = 81.9 * 1  # (aux_index) timeout th  # 10%
+    aux_th = 100.0 * 1  # (aux_index) timeout th  # 10%
+    denom = 1
+    if title == 'latency' or title == 'latency_highlight':
+        # denom = 86400 / 12.06 # 7164.1791044776
+        denom = 7164
 
     """
     Open pkl
@@ -50,7 +54,7 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
             loaded_data = pickle.load(f)
             target_data = loaded_data[index]
 
-        avg_target_data = operations[op](target_data)
+        avg_target_data = operations[op](target_data) / denom
 
         if E not in data:
             data[E] = []
@@ -204,7 +208,8 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
                 for ytick, xtick in np.ndindex(pivot_df.shape):
                     value = pivot_df.iat[ytick, xtick]
                     # print(qcs[xtick], ds[ytick], value)
-                    if 20 > value:
+                    # if 32 >= value:
+                    if 1.09 > value:
                         rect = patches.Rectangle(
                             (xtick+0.05, ytick+0.05), 1-0.05*2, 1-0.05*2,
                             linewidth=2, edgecolor=markers_palette[i],
@@ -217,7 +222,8 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
                     value = pivot_df.iat[ytick, xtick]
                     aux_value = aux_pivot_df.iat[ytick, xtick]
                     # print(qcs[xtick], ds[ytick], value)
-                    if 20 > value:
+                    # if 32 >= value:
+                    if 1.09 > value:
                         rect = patches.Rectangle(
                             (xtick+0.05, ytick+0.05), 1-0.05*2, 1-0.05*2,
                             linewidth=2, edgecolor=markers_palette[i],
@@ -234,7 +240,8 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
                         # left, bottom, width, height
                         cax=fig.add_axes([0.904, 0.114, 0.012, 0.767]),
                         orientation='vertical')
-    cbar.set_label('Latency', labelpad=-45.5)
+    # cbar.set_label('Stale', labelpad=-37.75)
+    cbar.set_label('Latency (x7164)', labelpad=-34.5)
     if aux_index != None:
         sm = plt.cm.ScalarMappable(
             cmap=aux_cmap, norm=plt.Normalize(vmin=aux_vmin, vmax=aux_vmax))

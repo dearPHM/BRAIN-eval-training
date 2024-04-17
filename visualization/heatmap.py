@@ -209,8 +209,8 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
                     value = pivot_df.iat[ytick, xtick]
                     # print(qcs[xtick], ds[ytick], value)
                     # target = E * 256/ds[ytick] * qcs[xtick] / 21
-                    # if 32 >= value:
-                    if (1.09 > value):
+                    if 32 >= value:
+                    # if (1.09 > value):
                         rect = patches.Rectangle(
                             (xtick+0.05, ytick+0.05), 1-0.05*2, 1-0.05*2,
                             linewidth=2, edgecolor=markers_palette[i],
@@ -224,8 +224,8 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
                     aux_value = aux_pivot_df.iat[ytick, xtick]
                     # print(qcs[xtick], ds[ytick], value)
                     # target = E * 256/ds[ytick] * qcs[xtick] / 21
-                    # if (32 >= value) and (aux_value <= aux_th):
-                    if (1.09 > value) and (aux_value <= aux_th):
+                    if (32 >= value) and (aux_value <= aux_th):
+                    # if (1.09 > value) and (aux_value <= aux_th):
                         rect = patches.Rectangle(
                             (xtick+0.05, ytick+0.05), 1-0.05*2, 1-0.05*2,
                             linewidth=2, edgecolor=markers_palette[i],
@@ -242,8 +242,8 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
                         # left, bottom, width, height
                         cax=fig.add_axes([0.904, 0.114, 0.012, 0.767]),
                         orientation='vertical')
-    # cbar.set_label('Stale', labelpad=-52)
-    cbar.set_label('Latency (x7164)', labelpad=-48.5)
+    cbar.set_label('Stale', labelpad=-52)
+    # cbar.set_label('Latency (x7164)', labelpad=-48.5)
     if aux_index != None:
         sm = plt.cm.ScalarMappable(
             cmap=aux_cmap, norm=plt.Normalize(vmin=aux_vmin, vmax=aux_vmax))
@@ -252,7 +252,7 @@ def draw(index, aux_index=None, op='avg', title='', highlight=False):
                                 # left, bottom, width, height
                                 cax=fig.add_axes([0.954, 0.114, 0.012, 0.767]),
                                 orientation='vertical')
-        aux_cbar.set_label('Timeout', labelpad=-51.5)
+        aux_cbar.set_label('# of Timed out', labelpad=-51.5)
 
     # plt.tight_layout()
     # plt.show()

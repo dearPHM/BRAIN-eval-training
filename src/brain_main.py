@@ -34,7 +34,7 @@ if __name__ == '__main__':
     logger = SummaryWriter('./logs')
 
     args = args_parser()
-    exp_details(args)
+    # exp_details(args)
 
     num_byzantines = (args.byzantines if args.byzantines <
                       args.score_byzantines else args.score_byzantines)
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     scaling_factor = hyp['net']['scaling_factor']
     global_model = make_net(widths, batchnorm_momentum, scaling_factor)
     global_model.train()
-    print(global_model)
+    # print(global_model)
 
     # copy weights
     global_weights = global_model.state_dict()
@@ -68,24 +68,62 @@ if __name__ == '__main__':
 
     test_loss_collect, test_acc_collect = [], []
 
+    queue_len, updates_verified, updates_rejected, updates_rejected_ref = [], [], [], []
+
+    commit_ignored = 0
+
     # Cache
-    cache = ItemCache(min_counter=0, max_counter=args.stale)
+    cache = ItemCache(min_counter=0, max_counter=args.stale, brain=True)
 
     # Moving Average
     wma = MovingAverage(args.window)
 
+    # Update History
+    update_history = {}
+
+    # Byzantine Count
+    malicious = [{"count": 0, "streak" : 0} for _ in range(args.num_users)]
+
     for epoch in tqdm(range(args.epochs + args.stale)):
         if (len(cache.cache) == 0) and (epoch >= args.epochs):
             break
-
-        local_weights = []
+        
+        updates_verified.append(0)
+        updates_rejected.append(0)
+        updates_rejected_ref.append(0)
+        
+        # local_weights = []
         # print(f'\n | Global Training Round : {epoch+1} |\n')
 
-        if (epoch < args.epochs):
+        if (epoch < args.epochs and len(cache.queue) <= args.maxqueue):
             global_model.train()
             m = max(int(args.frac * args.num_users), 1)
             idxs_users = np.random.choice(
                 range(args.num_users), m, replace=False)
+
+            optim_model = None
+            ref = []
+
+            if args.optim:
+                optim_model = copy.deepcopy(global_model)
+                
+                count = len(cache.queue)
+
+                if (count != 0):
+                    optim_weight = copy.deepcopy(global_weights)
+                    for id, item, _ in cache.queue:
+                        proposer = update_history[id]
+
+                        if streak:= malicious[proposer]["streak"] > 0:
+                            commit_ignored += 1
+                            continue
+
+                        ref.append(id)
+
+                        alpha = wma.current()
+                        optim_weight = compose_weight(optim_weight, item, alpha)
+
+                    optim_model.load_state_dict(optim_weight)
 
             for idx in idxs_users:
                 if idx >= args.byzantines:
@@ -100,14 +138,16 @@ if __name__ == '__main__':
                                                        logger=logger)
 
                 w, loss = local_model.update_weights(
-                    model=copy.deepcopy(global_model), epochs=args.local_ep, global_round=epoch)
+                    model=copy.deepcopy(optim_model if args.optim else global_model), epochs=args.local_ep, global_round=epoch)
                 if idx >= args.byzantines:
                     traning_times.append(time.time() - traning_start)
 
                 # local_weights.append(copy.deepcopy(w))
-                cache.add_item_with_random_counter(copy.deepcopy(w))
+                id = cache.add_item_with_random_counter(copy.deepcopy(w), ref)
 
-        local_weights = cache.update_counters()
+                update_history[id] = idx
+
+        target_id, local_weight = cache.update_counters()
 
         # BRAIN: do evaluate, to get score, among randomly sampled nodes
         committee = list(range(args.num_users))
@@ -116,9 +156,8 @@ if __name__ == '__main__':
             committee = np.random.choice(
                 range(args.num_users), m, replace=False)
 
-        local_eval_med_accs = []
-        if len(local_weights) != 0:
-            for local_weight in local_weights:
+        local_eval_med_acc = 0
+        if target_id:
                 local_eval_acc = []
 
                 for idx in committee:
@@ -139,52 +178,87 @@ if __name__ == '__main__':
                 med_score = statistics.median(local_eval_acc)
                 # BRAIN: reject updates using score by `threshold`
                 if med_score >= args.threshold:
-                    local_eval_med_accs.append(med_score)
+                    local_eval_med_acc = med_score
                 else:
-                    local_eval_med_accs.append(None)
+                    local_eval_med_acc = None
 
         # update global weights
-        if len(local_weights) != 0:
-            for local_weight, score in zip(local_weights, local_eval_med_accs):
-                # BRAIN: aggregate updates using `window`-sized moving average
-                if score is None:
-                    pass
-                else:
-                    alpha = wma.next(score)
-                    global_weights = compose_weight(
-                        global_weights, local_weight, alpha)
-                    global_model.load_state_dict(global_weights)
+        if target_id:
+
+            proposer = update_history[target_id]
+
+            if local_eval_med_acc is None:
+                updates_rejected[-1] += 1
+                
+                if args.optim:
+                    updates_rejected_ref[-1] += len(cache.queue) + len(cache.cache)
+
+                    cache.cache = [(id_, item_, counter, ref_) for id_, item_, counter, ref_ in cache.cache if target_id not in ref_]
+                    cache.queue = [(id_, item_, ref_) for id_, item_, ref_ in cache.queue if target_id not in ref_]
+                    
+                    updates_rejected_ref[-1] -= len(cache.queue) + len(cache.cache)
+
+                    updates_rejected[-1] += updates_rejected_ref[-1]
+
+                if args.history:
+                    malicious[proposer]["count"] = malicious[proposer]["count"] + 1
+                    malicious[proposer]["streak"] = malicious[proposer]["count"]
+            else:
+                updates_verified[-1] += 1
+
+                if args.history:
+                    if streak:= malicious[proposer]["streak"] > 0:
+                            malicious[proposer]["streak"] = streak - 1
+                
+                alpha = wma.next(local_eval_med_acc)
+                global_weights = compose_weight(
+                    global_weights, local_weight, alpha)
+                global_model.load_state_dict(global_weights)
 
         # Test inference after completion of training
         test_acc, test_loss = test_inference(args, global_model, test_dataset)
         test_acc_collect.append(test_acc)
         test_loss_collect.append(test_loss)
+
+        queue_len.append(len(cache.queue))
+
         # print(
         #     f'\nResults after {epoch+1}/{args.epochs+1} global rounds of training:')
         # print("Test Accuracy: {:.2f}%".format(100*test_acc))
         # print(f'Test Loss    : {format(test_loss)}')
 
-    # Saving the objects test_loss_collect and test_acc_collect:
-    file_name = './save/objects/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_D{}_W{}_S{}_TH{}_{}.pkl'.\
-        format(args.dataset, args.model, args.epochs, args.frac, args.iid,
+    argstring = 'brain{}_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_D{}_W{}_S{}_TH{}_Q{}{}'.\
+        format('_optim' if args.optim else '', args.dataset, args.model, args.epochs, args.frac, args.iid,
                args.local_ep, args.local_bs, args.byzantines, args.score_byzantines,
-               args.diff, args.window, args.stale, args.threshold, time.time())
+               args.diff, args.window, args.stale, args.threshold, args.maxqueue, '_H' if args.history else '')
+    
+    header = argstring + '_' + str(time.time())
 
-    with open(file_name, 'wb') as f:
+    # Saving the objects test_loss_collect and test_acc_collect:
+    with open('./save/objects/' + header + '.pkl', 'wb') as f:
         pickle.dump([test_loss_collect, test_acc_collect], f)
 
     print('\n Total Run Time: {0:0.4f}'.format(time.time()-start_time))
     print(f'\n Avg Training Time: {np.median(np.array(traning_times))}')
-    file_path = './results/times.csv'
-    os.makedirs('./results', exist_ok=True)
-    with open(file_path, 'a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(traning_times)
+    # file_path = './results/times.csv'
+    # os.makedirs('./results', exist_ok=True)
+    # with open(file_path, 'a', newline='') as file:
+    #     writer = csv.writer(file)
+    #     writer.writerow(traning_times)
+
+    print(" Average Acc: {}".format(np.mean(test_acc_collect)))
+    print(" Peak Acc: {}\n".format(np.max(test_acc_collect)))
+
+    if args.optim and args.history:
+        print(" {} Commits ignored during lookahead model update\n".format(commit_ignored))
 
     # PLOTTING (optional)
     import matplotlib
     import matplotlib.pyplot as plt
     matplotlib.use('Agg')
+
+    png_path_format = './save/' + argstring + '/{}/'
+    png_file_format = png_path_format + header + '_{}.png'
 
     # Plot Loss curve
     plt.figure()
@@ -192,10 +266,8 @@ if __name__ == '__main__':
     plt.plot(range(len(test_loss_collect)), test_loss_collect, color='r')
     plt.ylabel('Training loss')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_D{}_W{}_S{}_TH{}_loss.png'.
-                format(args.dataset, args.model, args.epochs, args.frac,
-                       args.iid, args.local_ep, args.local_bs, args.byzantines, args.score_byzantines,
-                       args.diff, args.window, args.stale, args.threshold))
+    os.makedirs(png_path_format.format('loss'), exist_ok=True)
+    plt.savefig(png_file_format.format('loss', 'loss'))
 
     # Plot Average Accuracy vs Communication rounds
     plt.figure()
@@ -203,7 +275,23 @@ if __name__ == '__main__':
     plt.plot(range(len(test_acc_collect)), test_acc_collect, color='k')
     plt.ylabel('Average Accuracy')
     plt.xlabel('Communication Rounds')
-    plt.savefig('./save/brain_{}_{}_{}_C{}_iid{}_E{}_B{}_Z{}_SZ{}_D{}_W{}_S{}_TH{}_acc.png'.
-                format(args.dataset, args.model, args.epochs, args.frac,
-                       args.iid, args.local_ep, args.local_bs, args.byzantines, args.score_byzantines,
-                       args.diff, args.window, args.stale, args.threshold))
+    os.makedirs(png_path_format.format('acc'), exist_ok=True)
+    plt.savefig(png_file_format.format('acc', 'acc'))
+
+    # Plot Queue Length vs Communication rounds
+    plt.figure()
+    plt.title('Queue Length vs Communication rounds')
+    plt.plot(range(len(queue_len)), queue_len, color='k')
+    plt.ylabel('Queue Length')
+    plt.xlabel('Communication Rounds')
+    os.makedirs(png_path_format.format('queue'), exist_ok=True)
+    plt.savefig(png_file_format.format('queue', 'queue'))
+
+    # Plot Cumulative Commit Results vs Communication rounds
+    plt.figure()
+    plt.title('Commit Results vs Communication rounds')
+    plt.stackplot(range(len(updates_verified)), np.cumsum(updates_verified), np.cumsum(updates_rejected), colors=['b', 'r'])
+    plt.ylabel('Commit Results')
+    plt.xlabel('Communication Rounds')
+    os.makedirs(png_path_format.format('commit'), exist_ok=True)
+    plt.savefig(png_file_format.format('commit', 'commit'))
